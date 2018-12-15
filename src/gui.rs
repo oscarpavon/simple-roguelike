@@ -2,13 +2,14 @@ use crate::crossterm::cursor::*;
 use crate::crossterm::terminal::*;
 use crossterm::style::{Color, style};
 
-pub fn draw(){
-    let mut player_health = 0;
-
-    if player_health < 2000 {
-        player_health += 1;
-    }
+pub struct GUI {
+    pub height : u32,
+    pub width : u32
+}
+impl GUI {
+    pub fn draw(& self){
     
+
     
     let _terminal = terminal();
     //_terminal.clear(ClearType::All);
@@ -19,8 +20,9 @@ pub fn draw(){
 	
 	let (width, height) = _terminal.terminal_size();	
 	_cursor.goto(width - 10, 0);	//always in the right corner (width - char count)
-	println!("{}", style(format!("Health: {}", player_health))
+	println!("{}", style(format!("Health: {}", 2))
 				   .with(Color::Red));	
 
 	//_cursor.reset_position(); //back to the original position for writen the other text
+}
 }
