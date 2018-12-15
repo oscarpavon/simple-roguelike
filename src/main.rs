@@ -65,15 +65,17 @@ fn main() {
 	//loop
 	while true {
 		//playing
+		//input()
 		match _input.read_line() {
-     		Ok(s) => println!("string typed: {}", s),
+     		Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
      		Err(e) => println!("error: {}", e),
  		}
+		//system_player()
 		_terminal.clear(ClearType::All);
 		_gui.draw();
 		
-		//input()
-		//system_player()
+		
+		
 	}
 
 }
