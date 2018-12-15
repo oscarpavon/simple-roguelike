@@ -47,6 +47,9 @@ fn main() {
 	println!("{}", style("Type 'help' to see the available commands.")
 				   .with(Color::DarkGreen));
 
+	println!("{}", style("Press Enter key to play")
+				   .with(Color::White));
+
 	state.add_register(goblin.clone());
 	state.add_register(goblin.clone());
 
@@ -55,7 +58,7 @@ fn main() {
 	let _gui = GUI {
 		_game_state : state,		
 		height : _height,
-		width : _width
+		width : _width		
 	};
 
 	let _input = input();
