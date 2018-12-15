@@ -47,9 +47,12 @@ fn main() {
 	state.add_register(goblin.clone());
 	state.add_register(goblin.clone());
 
+	//loop
 	while true {
 		//playing
 		gui::draw();
+		//input()
+		//system_player
 	}
 }
 
