@@ -6,6 +6,7 @@ mod gui;
 
 extern crate crossterm;
 use crossterm::terminal::*;
+use crossterm::input;
 use crossterm::style::{Color, style};
 
 use crate::features::Feature;
@@ -16,12 +17,13 @@ use crate::gui::*;
 
 fn main() {
 
-	let terminal = terminal();
-	terminal.clear(ClearType::All);
+	let _terminal = terminal();
+	_terminal.clear(ClearType::All);
+	let (_width, _height) = _terminal.terminal_size();
 
 	let human_warrior = Creature {
 		name: String::from("human_warrior"),
-		health: 20,
+		health: 25,
 		damage: 4,
 		features: vec![]
 	};
@@ -38,6 +40,7 @@ fn main() {
 	println!("{}", style("######### Simple Rusty Roguelike #########").with(Color::DarkYellow));
 	println!("{}", line);
 
+
 	println!("{}", style("\n## You're the only human warrior left and must defeat all enemies!\n")
 				   .with(Color::Green));
 
@@ -47,17 +50,28 @@ fn main() {
 	state.add_register(goblin.clone());
 	state.add_register(goblin.clone());
 
-	let mut player_health = 0;
+	
+	
 	let _gui = GUI {
-		height : 10,
-		width : 10
+		_game_state : state,		
+		height : _height,
+		width : _width
 	};
+
+	let _input = input();
 	//loop
 	while true {
 		//playing
+		match _input.read_line() {
+     		Ok(s) => println!("string typed: {}", s),
+     		Err(e) => println!("error: {}", e),
+ 		}
+		_terminal.clear(ClearType::All);
 		_gui.draw();
+		
 		//input()
 		//system_player()
 	}
+
 }
 
