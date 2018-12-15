@@ -35,21 +35,7 @@ fn main() {
 	};
 	let mut state = GameState::new(human_warrior.clone());
 
-	let line = style("##########################################").with(Color::DarkYellow);
-	println!("{}", line);
-	println!("{}", style("######### Simple Rusty Roguelike #########").with(Color::DarkYellow));
-	println!("{}", line);
-
-
-	println!("{}", style("\n## You're the only human warrior left and must defeat all enemies!\n")
-				   .with(Color::Green));
-
-	println!("{}", style("Type 'help' to see the available commands.")
-				   .with(Color::DarkGreen));
-
-	println!("{}", style("Press Enter key to play")
-				   .with(Color::White));
-
+	
 	state.add_register(goblin.clone());
 	state.add_register(goblin.clone());
 
@@ -61,6 +47,7 @@ fn main() {
 		width : _width		
 	};
 
+	_gui.DrawMainMenu();
 	let _input = input();
 	//loop
 	while true {

@@ -6,6 +6,7 @@ pub struct GUI {
     pub _game_state : GameState,
     pub height : u16,
     pub width : u16,
+    
 }
 impl GUI {
     pub fn draw(& self){
@@ -20,7 +21,7 @@ impl GUI {
         //Stats
         let player_health = _player.health;  
             
-        let player_name = &_player.name;
+        let player_name = &_player.name;//string variables need be reference
 
         let demage_per_hit = _player.damage;    
 
@@ -54,14 +55,42 @@ impl GUI {
            \ \__/\__/ /
          ___\ \|--|/ /___
        /`    \      /    `\
-  jgs /       '----'       \ */             //error while put in variable, ascii error (?)
+  jgs /       '----'       \ */             //error while put this character in a variable, ascii error (?)
 
 
 
 
-
+        
         _cursor.goto(0,self.height-2);
         println!("Command:")
-}
+    }
+    //print text only where no have GUI (min: 1 , max = height - 3 )
+    pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
+        let _cursor = cursor();
+        _cursor.goto(pos_x, pos_y);
+        println!("{}",text_to_write_in_game_window);
+    }
+
+
+    pub fn DrawMainMenu(&self){
+        for x in 0..self.width {
+             self.print_in_game_camera(String::from("x"), Color::Green, x, 1);
+        }
+       let line = style("##########################################").with(Color::DarkYellow);
+	println!("{}", line);
+	println!("{}", style("######### Simple Rusty Roguelike #########").with(Color::DarkYellow));
+	println!("{}", line);
+
+
+	println!("{}", style("\n## You're the only human warrior left and must defeat all enemies!\n")
+				   .with(Color::Green));
+
+	println!("{}", style("Type 'help' to see the available commands.")
+				   .with(Color::DarkGreen));
+
+	println!("{}", style("Press Enter key to play")
+				   .with(Color::White));
+
+    }
 }
 
