@@ -2,6 +2,7 @@ mod game_state;
 mod creatures;
 mod commands;
 mod features;
+mod gui;
 
 extern crate crossterm;
 use crossterm::terminal::*;
@@ -10,6 +11,8 @@ use crossterm::style::{Color, style};
 use crate::features::Feature;
 use crate::game_state::GameState;
 use crate::creatures::*;
+
+use crate::gui::*;
 
 fn main() {
 
@@ -44,7 +47,9 @@ fn main() {
 	state.add_register(goblin.clone());
 	state.add_register(goblin.clone());
 
-	while state.round() {
+	while true {
 		//playing
+		gui::draw();
 	}
 }
+
