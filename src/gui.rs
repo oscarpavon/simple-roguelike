@@ -3,17 +3,15 @@ use crossterm::style::{Color, style};
 
 use crate::GameState;
 pub struct GUI {
-    pub _game_state : GameState,
     pub height : u16,
     pub width : u16,
     
 }
 impl GUI {
-    pub fn draw(& self){
+    pub fn draw(& self, _game : &GameState){
     
         let _cursor = cursor();
-        let _game = &self._game_state;
-
+       
         let _player = _game.creatures.get(0)
             .expect("Game logic error: the player is dead and the game is still running.");
 

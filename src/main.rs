@@ -41,8 +41,7 @@ fn main() {
 
 	
 	
-	let _gui = GUI {
-		_game_state : state,		
+	let _gui = GUI {		
 		height : _height,
 		width : _width		
 	};
@@ -59,7 +58,7 @@ fn main() {
  		}
 		//system_player()
 		_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
-		_gui.draw();
+		_gui.draw(&state);
 		
 		
 		
