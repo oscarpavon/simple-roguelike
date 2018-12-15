@@ -60,37 +60,44 @@ impl GUI {
 
 
 
-        
+        self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
         _cursor.goto(0,self.height-2);
         println!("Command:")
     }
     //print text only where no have GUI (min: 1 , max = height - 3 )
+    //TODO: where not draw condition
     pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
         let _cursor = cursor();
         _cursor.goto(pos_x, pos_y);
-        println!("{}",text_to_write_in_game_window);
+        println!("{}",text_to_write_in_game_window);//TODO: add color features
     }
 
 
-    pub fn DrawMainMenu(&self){
+    pub fn draw_main_menu(&self){
         for x in 0..self.width {
              self.print_in_game_camera(String::from("x"), Color::Green, x, 1);
         }
-       let line = style("##########################################").with(Color::DarkYellow);
-	println!("{}", line);
-	println!("{}", style("######### Simple Rusty Roguelike #########").with(Color::DarkYellow));
-	println!("{}", line);
+        
+        
+        self.print_in_game_camera(String::from("Simple Rusty Roguelike"), Color::Green, self.width/2-11, 4);
 
+        println!("{}", style("\n## You're the only human warrior left\n")
+                    .with(Color::Green));
+        println!("{}", style("\n and must defeat all enemies!\n")
+                    .with(Color::Green));
 
-	println!("{}", style("\n## You're the only human warrior left and must defeat all enemies!\n")
-				   .with(Color::Green));
+        self.print_in_game_camera(String::from("-->Play<--"), Color::Green, self.width/2-6, self.height - 8);//concept
+        self.print_in_game_camera(String::from("Exit"), Color::Green, self.width/2-3, self.height - 7);
 
-	println!("{}", style("Type 'help' to see the available commands.")
-				   .with(Color::DarkGreen));
-
-	println!("{}", style("Press Enter key to play")
-				   .with(Color::White));
-
+        for i in 1..self.height-3 {
+             self.print_in_game_camera(String::from("x"), Color::Green, 0, i);
+        }
+        for i in 1..self.height-3 {
+             self.print_in_game_camera(String::from("x"), Color::Green, self.width, i);
+        }
+        for i in 0..self.width {
+             self.print_in_game_camera(String::from("x"), Color::Green, i, self.height-3);
+        }
     }
 }
 

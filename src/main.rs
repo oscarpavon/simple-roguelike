@@ -47,18 +47,18 @@ fn main() {
 		width : _width		
 	};
 
-	_gui.DrawMainMenu();
+	_gui.draw_main_menu();
 	let _input = input();
 	//loop
 	while true {
-		//playing
+		//playing..
 		//input()
-		match _input.read_line() {
+		match _input.read_line() {//this is for pause purpose
      		Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
      		Err(e) => println!("error: {}", e),
  		}
 		//system_player()
-		_terminal.clear(ClearType::All);
+		_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
 		_gui.draw();
 		
 		
