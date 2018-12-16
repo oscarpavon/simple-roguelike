@@ -1,7 +1,7 @@
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
 use std::process::Command;
-
+use std::str::FromStr;
 use crate::GameState;
 pub struct GUI {
     pub height : u16,
@@ -28,58 +28,16 @@ impl GUI {
     }
     pub fn draw(& self, _game : &GameState){
     
-        let _cursor = cursor();
-       
-        let _player = _game.creatures.get(0)
-            .expect("Game logic error: the player is dead and the game is still running.");
+       self.draw_status_bar(_game);
+       self.print_in_game_camera(String::from("Creatures:"), Color::Green, 0, 2);    
 
 
-        //Stats
-        let player_health = _player.health;  
-            
-        let player_name = &_player.name;//string variables need be reference
+       self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
 
-        let demage_per_hit = _player.damage;    
-
-
-        //Draw stats
-        _cursor.goto(0, 0);	 
-        println!("{}", style(format!("Name: {}",player_name)) 
-                    .with(Color::White));
-        _cursor.goto(25, 0);
-        println!("{}", style(format!("Demage: {}",demage_per_hit)) 
-                    .with(Color::Blue));
-        //Draw health
-        _cursor.goto(self.width-3, 0);	
-        println!("{}", style(format!("{}%", player_health)) //player health
-                    .with(Color::White));
-
-        _cursor.goto(self.width-7, 0);	    
-        println!("{}", style(format!("<3: ")) //heart icon
-                    .with(Color::Red));
-
-
-
-/* -=[ goblins ]=-  6/97
-             ,      ,
-            /(.-""-.)\
-        |\  \/      \/  /|
-        | \ / =.  .= \ / |
-        \( \   o\/o   / )/
-         \_, '-/  \-' ,_/
-           /   \__/   \
-           \ \__/\__/ /
-         ___\ \|--|/ /___
-       /`    \      /    `\
-  jgs /       '----'       \ */             //error while put this character in a variable, ascii error (?)
-
-
-
-
-        self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
-        _cursor.goto(0,self.height-2);
-        println!("Command:")
+       let _cursor = cursor();
+       _cursor.goto(0, self.height);//input command position
     }
+
     //print text only where no have GUI (min: 1 , max = height - 3 )
     //TODO: where not draw condition
     pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
@@ -115,5 +73,55 @@ impl GUI {
              self.print_in_game_camera(String::from("x"), Color::Green, i, self.height-3);
         }
     }
+
+    pub fn draw_enemies_names(){
+            //TODO
+    }
+
+    fn draw_status_bar(& self, _game : &GameState){
+         let _cursor = cursor();
+
+        let _player = _game.creatures.get(0)
+            .expect("Game logic error: the player is dead and the game is still running.");
+
+
+        //Stats
+        let player_health = _player.health;  
+            
+        let player_name = &_player.name;//string variables need be reference
+
+        let demage_per_hit = _player.damage;   
+        
+        //Draw stats
+        _cursor.goto(0, 0);	 
+        println!("{}", style(format!("Name: {}",player_name)) 
+                    .with(Color::White));
+        _cursor.goto(25, 0);
+        println!("{}", style(format!("Demage: {}",demage_per_hit)) 
+                    .with(Color::Blue));
+        //Draw health
+        _cursor.goto(self.width-3, 0);	
+        println!("{}", style(format!("{}%", player_health)) //player health
+                    .with(Color::White));
+
+        _cursor.goto(self.width-7, 0);	    
+        println!("{}", style(format!("<3: ")) //heart icon
+                    .with(Color::Red)); 
+
+        _cursor.goto(0,self.height-2);
+        println!("Command:")
+    }
 }
 
+/* -=[ goblins ]=-  6/97
+             ,      ,
+            /(.-""-.)\
+        |\  \/      \/  /|
+        | \ / =.  .= \ / |
+        \( \   o\/o   / )/
+         \_, '-/  \-' ,_/
+           /   \__/   \
+           \ \__/\__/ /
+         ___\ \|--|/ /___
+       /`    \      /    `\
+  jgs /       '----'       \ */             //error while put this character in a variable, ascii error (?)
