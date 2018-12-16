@@ -8,7 +8,6 @@ use std::env; //for input argument
 extern crate crossterm;
 use crossterm::terminal::*;
 use crossterm::input;
-use crossterm::style::{Color, style};
 
 use crate::features::Feature;
 use crate::game_state::GameState;
@@ -40,7 +39,7 @@ fn start_game(mode : u8){
 	
 	let (_width, _height) = _terminal.terminal_size();
 
-	let creatures =  create_struct_creatures();
+	let creatures =  create_creatures_structs();
 
 	let mut state = GameState::new(creatures[0].clone()); // [0] is the player
 
@@ -54,10 +53,13 @@ fn start_game(mode : u8){
 		width : _width		
 	};
 
+	let _input = input();
+
+	//TODO: read input, log, event from the other terminal
 	if mode == GUI_DEBUG_MODE {
-		_gui.create();
+		_gui.create(); //open the new terminal a execute the game without argument
 		loop {
-			let _input = input();
+			
 			match _input.read_line() {//this is for pause purpose
 				Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
 				Err(e) => println!("error: {}", e),
@@ -66,11 +68,9 @@ fn start_game(mode : u8){
 	}else{
 
 		_terminal.clear(ClearType::All);
-		_gui.draw_main_menu();
-		let _input = input();
-		
-		
-		//loop
+		_gui.draw_main_menu();	
+				
+		//main game loop
 		loop {
 			//playing..
 			//input()
@@ -79,7 +79,8 @@ fn start_game(mode : u8){
 				Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
 				Err(e) => println!("error: {}", e),
 			}
-			//system_player()
+			////////state.round() --> system_player() 
+			
 			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
 			
 			_gui.draw(&state);
@@ -111,7 +112,7 @@ fn get_mode_number() -> u8{
 	mode_number
 }
 
-fn create_struct_creatures() -> Vec<Creature> {
+fn create_creatures_structs() -> Vec<Creature> {
 	let human_warrior = Creature {
 		name: String::from("human_warrior"),
 		health: 25,
