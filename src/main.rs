@@ -40,23 +40,12 @@ fn start_game(mode : u8){
 	
 	let (_width, _height) = _terminal.terminal_size();
 
-	let human_warrior = Creature {
-		name: String::from("human_warrior"),
-		health: 25,
-		damage: 4,
-		features: vec![]
-	};
-	let goblin = Creature {
-		name: String::from("goblin"),
-		health: 12,
-		damage: 2,
-		features: vec![Feature::Aggression]
-	};
-	let mut state = GameState::new(human_warrior.clone());
+	let creatures =  create_struct_creatures();
 
-	
-	state.add_register(goblin.clone());
-	state.add_register(goblin.clone());
+	let mut state = GameState::new(creatures[0].clone()); // [0] is the player
+
+	state.add_register(creatures[1].clone());
+	state.add_register(creatures[1].clone());
 
 	
 	
@@ -120,4 +109,25 @@ fn get_mode_number() -> u8{
 		mode_number = GUI_NORMAL_MODE;
 	}
 	mode_number
+}
+
+fn create_struct_creatures() -> Vec<Creature> {
+	let human_warrior = Creature {
+		name: String::from("human_warrior"),
+		health: 25,
+		damage: 4,
+		features: vec![]
+	};
+	let goblin = Creature {
+		name: String::from("goblin"),
+		health: 12,
+		damage: 2,
+		features: vec![Feature::Aggression]
+	};
+
+	let mut created_creatures = Vec::new();
+	created_creatures.push(human_warrior);
+	created_creatures.push(goblin);	
+
+	created_creatures 
 }
