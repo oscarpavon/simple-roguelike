@@ -18,7 +18,9 @@ pub enum Command {
 	Examine(CreatureId),
 	Status,
     Help,
-    Debug(DebugCommand)
+    Debug(DebugCommand),
+    Dummy
+
 }
 pub enum DebugCommand {
     Remove(CreatureId)
@@ -29,9 +31,7 @@ impl Command {
 		let stdin = io::stdin();
 		let mut input_string_buffer = String::new();
 
-
-		loop {
-
+	
 			stdin.read_line(&mut input_string_buffer).unwrap();
 
 
@@ -45,7 +45,7 @@ impl Command {
 					if parts.len() > 1 {
 						if let Some(target) = state.creatures.find(parts[1]) {
                             if target != PLAYER_ID {
-                                break Command::Attack(target);
+                                Command::Attack(target);
                             } else {
                                 println!("{}", style("Don't attack yourself!")
                                             .with(Color::DarkRed))
@@ -58,17 +58,17 @@ impl Command {
 				"examine" => {
 					if parts.len() > 1 {
 						if let Some(target) = state.creatures.find(parts[1]) {
-							break Command::Examine(target);
+							Command::Examine(target);
 						}
 					}
                     println!("{}", style("Please write a correct target: ex: 'examine goblin'.")
                                    .with(Color::DarkRed))
 				}
 				"status" => {
-					break Command::Status;
+					Command::Status;
 				}
 				"help" => {
-    				break Command::Help;
+    				Command::Help;
 				}
                 "debug" => {
                     if DEBUG_MODE_ENABLED {
@@ -77,7 +77,7 @@ impl Command {
                                 "remove" => {
                                     if parts.len() > 2 {
                                         if let Some(target) = state.creatures.find(parts[2]) {
-                        				    break Command::Debug(DebugCommand::Remove(target));
+                        				    Command::Debug(DebugCommand::Remove(target));
                 					    }
                                     }
                                 }
@@ -93,12 +93,16 @@ impl Command {
                                    .with(Color::DarkRed))
                     }
                 }
-                _ => println!("{}",
+                _ => {
+                    println!("{}",
                               style(format!("'{}' is not a correct command.", parts[0]))
                               .with(Color::DarkRed))
+                            
+                }
 			}
 
 			input_string_buffer.clear();
-		}
+            Command::Dummy
+		
 	}
 }

@@ -25,17 +25,7 @@ pub fn player_system(state: &mut GameState) {
 									   .expect("Game logic error: the player is dead and the game is still running.")
 									   .health;
 	
-	//Display health bar in the right corner
-	let _cursor = cursor();
-	_cursor.save_position();	
-	let _terminal = terminal();
-	let (width, height) = _terminal.terminal_size();	
-	_cursor.goto(width-10, 0);	//always in the right corner (width - char count)
-	println!("{}", style(format!("Health: {}", player_health))
-				   .with(Color::Red));		
-	_cursor.reset_position(); //back to the original position for writen the other text
 	
-
 	// Player control consists of three phases:
 	// 1- Show the enviroment and conditions:	
 	
@@ -61,45 +51,5 @@ pub fn player_system(state: &mut GameState) {
 		println!("{}", stylized);
 	}
 
-	// 2- Ask for player input
-	println!("{}", style("Enter a command:")
-				   .with(Color::DarkGreen));
-	loop {
-		
-		let chosen = Command::get(state);
-
-		// 3- Process the input.
-		match chosen {
-			Command::Attack(target) => {
-				break state.hit(PLAYER_ID, target);
-			}
-			Command::Examine(target) => {
-				let creature = state.creatures.get(target)
-											  .expect("Game logic error: if the player is choosing this creature then it must exist.");
-				let stylized = style(format!("{} has {} hitpoints remaining and does {} damage.",
-				creature.name, creature.health, creature.damage)).with(Color::Red);
-				println!("{}", stylized);
-			}
-			Command::Status => {
-				println!("{}", style(format!("== You have {} hitpoints remaining.", player_health))
-						   			.with(Color::Green));
-				let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
-				println!("{}", stylized);
-			}
-			Command::Help => {
-				println!("The available commands are:
-attack: Hit enemies. Usage: 'attack enemy_name'
-examine: Shows the status of a creature. Usage: 'examine enemy_name'
-status: Show your character's status and remaining enemies."
-				);
-			}
-			Command::Debug(DebugCommand::Remove(target)) => {
-				let creature: Creature = state.creatures.remove(target);
-				println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
-			}
-		}
-		//_cursor.goto(0, 30); TODO
-		println!("{}", style("Enter another command:")
-					   .with(Color::DarkGreen));
-	}
+	
 }

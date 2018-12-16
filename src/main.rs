@@ -5,13 +5,16 @@ mod features;
 mod gui;
 
 use std::env; //for input argument
+
 extern crate crossterm;
 use crossterm::terminal::*;
 use crossterm::input;
+use crossterm::style::{Color, style};
 
 use crate::features::Feature;
-use crate::game_state::GameState;
+use crate::game_state::{GameState, PLAYER_ID};
 use crate::creatures::*;
+use crate::commands::*;
 
 use crate::gui::*;
 
@@ -71,16 +74,9 @@ fn start_game(mode : u8){
 		_gui.draw_main_menu();	
 				
 		//main game loop
-		loop {
-			//playing..
-			//input()
-			
-			match _input.read_line() {//this is for pause purpose
-				Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
-				Err(e) => println!("error: {}", e),
-			}
-			////////state.round() --> system_player() 
-			
+		loop {		
+			let typed_command = Command::get(&state);
+			//input_command(&state, typed_command);
 			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
 			
 			_gui.draw(&state);
@@ -131,4 +127,41 @@ fn create_creatures_structs() -> Vec<Creature> {
 	created_creatures.push(goblin);	
 
 	created_creatures 
+}
+
+fn input_command(state: &mut GameState, _input_command : Command){		
+
+	match _input_command {
+			Command::Attack(target) => {
+				state.hit(PLAYER_ID, target);
+			}
+			Command::Examine(target) => {
+				let creature = state.creatures.get(target)
+											  .expect("Game logic error: if the player is choosing this creature then it must exist.");
+				let stylized = style(format!("{} has {} hitpoints remaining and does {} damage.",
+				creature.name, creature.health, creature.damage)).with(Color::Red);
+				println!("{}", stylized);
+			}
+			Command::Status => {
+				
+				//let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
+				//println!("{}", stylized);
+			}
+			Command::Help => {
+				println!("The available commands are:
+attack: Hit enemies. Usage: 'attack enemy_name'
+examine: Shows the status of a creature. Usage: 'examine enemy_name'
+status: Show your character's status and remaining enemies."
+				);
+			}
+			Command::Debug(DebugCommand::Remove(target)) => {
+				let creature: Creature = state.creatures.remove(target);
+				println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
+			}
+			_ => {
+				//
+			}
+		}
+		
+	
 }
