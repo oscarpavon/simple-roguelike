@@ -1,5 +1,6 @@
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
+use std::process::Command;
 
 use crate::GameState;
 pub struct GUI {
@@ -8,6 +9,23 @@ pub struct GUI {
     
 }
 impl GUI {
+    pub fn create(&self) -> bool{
+        if cfg!(target_os = "windows"){
+            Command::new("cmd")
+                .arg("/k")
+                .arg("./target/debug/simple-roguelike")
+                .output()
+                .expect("failed to open cmd");
+        }
+        else{
+            Command::new("urxvt")//urxvt is my terminal
+                    .arg("-e")
+                    .arg("./target/debug/simple-roguelike")                     
+                    .output()
+                    .expect("failed to execute process");
+        }         
+        true
+    }
     pub fn draw(& self, _game : &GameState){
     
         let _cursor = cursor();
