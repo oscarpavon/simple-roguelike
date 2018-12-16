@@ -13,6 +13,8 @@ pub fn pause() {
 
 const DEBUG_MODE_ENABLED: bool = true;
 
+
+
 pub enum Command {
 	Attack(CreatureId),
 	Examine(CreatureId),
@@ -27,6 +29,7 @@ pub enum DebugCommand {
 }
 
 impl Command {
+   
 	pub fn get(state: &GameState) -> Command {
 		let stdin = io::stdin();
 		let mut input_string_buffer = String::new();
@@ -102,7 +105,7 @@ impl Command {
 			}
 
 			input_string_buffer.clear();
-            Command::Dummy
+            Command::Dummy //for test
 		
 	}
 }

@@ -53,14 +53,15 @@ fn start_game(mode : u8){
 	
 	let _gui = GUI {		
 		height : _height,
-		width : _width		
+		width : _width
+		
 	};
 
 	let _input = input();
 
 	//TODO: read input, log, event from the other terminal
 	if mode == GUI_DEBUG_MODE {
-		_gui.create(); //open the new terminal a execute the game without argument
+		_gui.create(); 										//open the new terminal a execute the game without argument
 		loop {
 			
 			match _input.read_line() {//this is for pause purpose
@@ -75,10 +76,10 @@ fn start_game(mode : u8){
 				
 		//main game loop
 		loop {		
-			let typed_command = Command::get(&state);
-			//input_command(&state, typed_command);
-			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
+			let result_command = Command::get(&state);
 			
+			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
+			input_command(&state, result_command, &_gui);
 			_gui.draw(&state);
 			
 		}
@@ -129,11 +130,11 @@ fn create_creatures_structs() -> Vec<Creature> {
 	created_creatures 
 }
 
-fn input_command(state: &mut GameState, _input_command : Command){		
+fn input_command(state: &GameState, _input_command : Command, gui : &GUI){		
 
 	match _input_command {
 			Command::Attack(target) => {
-				state.hit(PLAYER_ID, target);
+				//state.hit(PLAYER_ID, target);
 			}
 			Command::Examine(target) => {
 				let creature = state.creatures.get(target)
@@ -146,6 +147,8 @@ fn input_command(state: &mut GameState, _input_command : Command){
 				
 				//let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
 				//println!("{}", stylized);
+				gui.print_in_game_camera(String::from("status"), Color::DarkBlue, 5, 5);
+				//gui.text = String::from("test");
 			}
 			Command::Help => {
 				println!("The available commands are:
@@ -155,8 +158,8 @@ status: Show your character's status and remaining enemies."
 				);
 			}
 			Command::Debug(DebugCommand::Remove(target)) => {
-				let creature: Creature = state.creatures.remove(target);
-				println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
+				//let creature: Creature = state.creatures.remove(target);
+				//println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
 			}
 			_ => {
 				//
@@ -165,3 +168,4 @@ status: Show your character's status and remaining enemies."
 		
 	
 }
+

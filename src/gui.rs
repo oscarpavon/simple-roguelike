@@ -6,7 +6,7 @@ use crate::GameState;
 pub struct GUI {
     pub height : u16,
     pub width : u16,
-    
+       
 }
 impl GUI {
     pub fn create(&self) -> bool{
@@ -27,14 +27,17 @@ impl GUI {
         true
     }
     pub fn draw(& self, _game : &GameState){
-    
+        let _cursor = cursor();
+
        self.draw_status_bar(_game);
        self.print_in_game_camera(String::from("Creatures:"), Color::Green, 0, 2);    
 
+        _cursor.goto(8,8);
+        println!("{}",String::from("sdf"));
 
        self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
 
-       let _cursor = cursor();
+       
        _cursor.goto(0, self.height);//input command position
     }
 
