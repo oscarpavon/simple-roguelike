@@ -10,7 +10,9 @@ use std::env; //for input argument
 extern crate crossterm;
 use crossterm::terminal::*;
 use crossterm::input;
+use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
+use crate::input::*;
 
 use crate::features::Feature;
 use crate::game_state::{GameState, PLAYER_ID};
@@ -21,6 +23,7 @@ use crate::gui::*;
 
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
 const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
+const GUI_DISABLED_MODE : u8 = 3; //TODO
 
 fn main() {
 	println!("Starting game..");
@@ -52,9 +55,11 @@ fn start_game(mode : u8){
 
 	create_weapons(&mut state);
 	
-	let _gui = GUI {		
+	let mut _gui = GUI {		
 		height : _height,
-		width : _width
+		width : _width,
+		cursor_position_x : 0,
+		cursor_position_y : 0
 		
 	};
 
@@ -78,40 +83,14 @@ fn start_game(mode : u8){
 		
 		//main game loop
 		loop {		
-
-			let mut text = String::new();
-			let _input_command = Command::get(&state);
-			
-			
-			match _input_command {
-				Command::Attack(target) => {
-					&state.hit(0, 1);
-					state.hit(1,0);
-				}
-				Command::Examine(target) => {
-					
-				}
-				Command::Status => {
-					text = String::from("status")
-				
-				}
-				Command::Help => {
-				
-				}
-				Command::Debug(DebugCommand::Remove(target)) => {
-				}
-				Command::Dummy => {
-					text = String::from("test command print =(")
-				}
-			}
-				
-			
-			let mut text = draw_text {
-			text : text
-			};
+			input_control(&mut _gui);
+			let mut text = String::from("test");
+			let mut texts_to_draw_in_gui = draw_text {
+				text : text
+				};
 			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
 			//input_command(&state, _input_command, &_gui);
-			_gui.draw(&state,text);
+			_gui.draw(&state,texts_to_draw_in_gui);
 			
 		}
 	}
@@ -201,7 +180,7 @@ status: Show your character's status and remaining enemies."
 }
 
 fn create_weapons(_state : &mut GameState){
-	let mut big_sword = Weapon {
+	let big_sword = Weapon {
 		name : String::from("big_sword"),
 		damage : 6,
 		is_used : true
@@ -220,4 +199,30 @@ fn create_weapons(_state : &mut GameState){
 	_state.weapon_manager.add_weapon(big_sword.clone());
 	_state.weapon_manager.add_weapon(stick.clone());
 	_state.weapon_manager.add_weapon(snife.clone());
+}
+
+fn input_control(gui : &mut GUI) {
+	let mut input = input();
+
+	
+	let _cursor = cursor();
+
+	
+	match input.read_char() {
+		Ok(s) => {
+			
+			match s {
+				'k' => gui.cursor_position_y -= 1,
+				'j' => gui.cursor_position_y += 1,
+				'h' => gui.cursor_position_x -= 1,
+				'l' => gui.cursor_position_x += 1,
+				_ => {}
+
+			}
+			
+			
+			
+			},
+		Err(e) => println!("char error : {}", e),
+	}
 }

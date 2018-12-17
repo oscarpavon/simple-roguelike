@@ -6,7 +6,8 @@ use crate::GameState;
 pub struct GUI {
     pub height : u16,
     pub width : u16,
-       
+    pub cursor_position_x : u16,
+    pub cursor_position_y : u16
 }
 pub struct draw_text {
     pub text : String
@@ -46,6 +47,7 @@ impl GUI {
 
        
        _cursor.goto(0, self.height);//input command position
+       _cursor.goto(self.cursor_position_x, self.cursor_position_y);
     }
 
     //print text only where no have GUI (min: 1 , max = height - 3 )
@@ -152,7 +154,7 @@ impl GUI {
         println!("{}", style(format!("Name: {}",player_name)) 
                     .with(Color::White));
         _cursor.goto(25, 0);
-        println!("{}", style(format!("Demage: {}",demage_per_hit)) 
+        println!("{}", style(format!("Damage: {}",demage_per_hit)) 
                     .with(Color::Blue));
         //Draw health
         _cursor.goto(self.width-3, 0);	
