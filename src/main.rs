@@ -86,6 +86,7 @@ fn start_game(mode : u8){
 		cursor_position_y : 0,
 		show_help_screen : false,
 		show_message_box : false,
+		show_main_menu : true,
 		float_menu_to_draw : new_float_menu
 	};
 
@@ -93,7 +94,7 @@ fn start_game(mode : u8){
 
 	//TODO: read input, log, event from the other terminal
 	if mode == GUI_DEBUG_MODE {
-		_gui.create(); 										//open the new terminal a execute the game without argument
+		_gui.create_in_another_terminal(); 										//open the new terminal a execute the game without argument
 		loop {
 			
 			match _input.read_line() {//this is for pause purpose
@@ -103,8 +104,7 @@ fn start_game(mode : u8){
 		}
 	}else{
 
-		_gui.clear();
-		_gui.draw_main_menu();	
+		_gui.clear();	
 				
 		
 		//main game loop
@@ -115,6 +115,11 @@ fn start_game(mode : u8){
 			_gui.center_x = _gui.width / 2;
 			_gui.center_y = _gui.height / 2;
 
+			if _gui.show_main_menu{
+				_gui.draw_main_menu();
+			}
+			
+
 			input_control(&mut _gui);
 			let mut text = String::from("test");
 			let mut texts_to_draw_in_gui = draw_text {
@@ -122,8 +127,9 @@ fn start_game(mode : u8){
 				};
 			_gui.clear();
 			//input_command(&state, _input_command, &_gui);
-			_gui.draw(&state,texts_to_draw_in_gui);
-			
+			if !_gui.show_main_menu{
+				_gui.draw(&state,texts_to_draw_in_gui);
+			}
 		}
 	}
 	
@@ -315,7 +321,14 @@ fn input_control(gui : &mut GUI) {
 					if gui.show_message_box == true{
 						gui.show_message_box = false;
 					}	
-				}		
+				}
+				'm' => {//main menu
+					if gui.show_main_menu == true{
+						gui.show_main_menu = false;
+					}else{
+						gui.show_main_menu = true;
+					}
+				}				
 				_ => {}
 
 			}

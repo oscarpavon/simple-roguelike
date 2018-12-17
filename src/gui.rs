@@ -4,6 +4,7 @@ use std::process::Command;
 use crossterm::terminal::*;
 use std::str::FromStr;
 use crate::GameState;
+
 pub struct GUI {
     pub height : u16,
     pub width : u16,
@@ -13,6 +14,7 @@ pub struct GUI {
     pub cursor_position_y : u16,
     pub show_help_screen : bool,
     pub show_message_box : bool,
+    pub show_main_menu : bool,
     pub float_menu_to_draw : FloatMenu
 }
 pub struct FloatMenu {
@@ -22,31 +24,35 @@ pub struct FloatMenu {
     pub position_x : u16,
     pub position_y : u16
 }
+
+
 pub struct draw_text {
     pub text : String
 }
 
 
 impl GUI {
-    pub fn create(&self) -> bool{
-        if cfg!(target_os = "windows"){
-            Command::new("cmd")
-                .arg("/k")
-                .arg("./target/debug/simple-roguelike")
-                .output()
-                .expect("failed to open cmd");
-        }
-        else{
-            Command::new("urxvt")//urxvt is my terminal
-                    .arg("-e")
-                    .arg("./target/debug/simple-roguelike")                     
-                    .output()
-                    .expect("failed to execute process");
-        }         
-        true
-    }
+   
     pub fn draw(& self, _game : &GameState, texts : draw_text){
+       if self.show_main_menu {
+           self.draw_main_menu();
+       }
+       else{
+           self.draw_game_interface(_game,texts);
+       }
+      self.draw_float_menu(&self.float_menu_to_draw);
+    }
+
+    //print text only where no have GUI (min: 1 , max = height - 3 )
+    //TODO: where not draw condition
+    pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
         let _cursor = cursor();
+        _cursor.goto(pos_x, pos_y);
+        println!("{}",style(text_to_write_in_game_window).with(_color));
+       
+    }
+    fn draw_game_interface(&self, _game : &GameState, texts : draw_text){
+         let _cursor = cursor();
 
        self.draw_status_bar(_game);
        self.draw_enemies_names(_game);
@@ -56,7 +62,7 @@ impl GUI {
         _cursor.goto(15,15);
         println!("{}",texts.text);
 
-        self.draw_float_menu(&self.float_menu_to_draw);
+        
 
        self.print_in_game_camera(String::from("Press '1' key to see help"), Color::Green, 1, self.height-4);
         if self.show_help_screen {
@@ -75,31 +81,36 @@ impl GUI {
        _cursor.goto(self.cursor_position_x, self.cursor_position_y);
     }
 
-    //print text only where no have GUI (min: 1 , max = height - 3 )
-    //TODO: where not draw condition
-    pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
-        let _cursor = cursor();
-        _cursor.goto(pos_x, pos_y);
-        println!("{}",style(text_to_write_in_game_window).with(_color));
-       
-    }
-
-
     pub fn draw_main_menu(&self){
         for x in 0..self.width {
              self.print_in_game_camera(String::from("x"), Color::Green, x, 1);
         }
         
+        let mut items_menu = Vec::new();
+        let item_one = String::from("Start");
+        let item_two = String::from("Exit");
         
+        items_menu.push(item_one);
+        items_menu.push(item_two);    
+
+
+        let new_float_menu = FloatMenu{
+            active : true,
+            selected_item : 0,
+            items_string_to_draw : items_menu,
+            position_x : self.center_x,
+            position_y : self.center_y
+        };
+        
+         self.draw_float_menu(&new_float_menu);
         self.print_in_game_camera(String::from("Simple Rusty Roguelike"), Color::Green, self.width/2-11, 4);
 
-        println!("{}", style("\n## You're the only human warrior left\n")
-                    .with(Color::Green));
-        println!("{}", style("\n and must defeat all enemies!\n")
-                    .with(Color::Green));
-
+        //You're the only human warrior left and must defeat all enemies!
+        
         self.print_in_game_camera(String::from("-->New Game<--"), Color::Green, self.width/2-6, self.height - 8);//concept
         self.print_in_game_camera(String::from("Exit"), Color::Green, self.width/2-3, self.height - 7);
+
+        
 
         for i in 1..self.height-3 {
              self.print_in_game_camera(String::from("x"), Color::Green, 0, i);
@@ -229,6 +240,25 @@ impl GUI {
     pub fn clear(&self){
         let terminal = terminal();
         terminal.clear(ClearType::All);
+    }
+
+
+     pub fn create_in_another_terminal(&self) -> bool{
+        if cfg!(target_os = "windows"){
+            Command::new("cmd")
+                .arg("/k")
+                .arg("./target/debug/simple-roguelike")
+                .output()
+                .expect("failed to open cmd");
+        }
+        else{
+            Command::new("urxvt")//urxvt is my terminal
+                    .arg("-e")
+                    .arg("./target/debug/simple-roguelike")                     
+                    .output()
+                    .expect("failed to execute process");
+        }         
+        true
     }
 }
 
