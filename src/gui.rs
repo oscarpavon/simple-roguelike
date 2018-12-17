@@ -8,6 +8,11 @@ pub struct GUI {
     pub width : u16,
        
 }
+pub struct draw_text {
+    pub text : String
+}
+
+
 impl GUI {
     pub fn create(&self) -> bool{
         if cfg!(target_os = "windows"){
@@ -26,14 +31,14 @@ impl GUI {
         }         
         true
     }
-    pub fn draw(& self, _game : &GameState){
+    pub fn draw(& self, _game : &GameState, texts : draw_text){
         let _cursor = cursor();
 
        self.draw_status_bar(_game);
        self.print_in_game_camera(String::from("Creatures:"), Color::Green, 0, 2);    
 
         _cursor.goto(8,8);
-        println!("{}",String::from("sdf"));
+        println!("{}",texts.text);
 
        self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
 

@@ -74,13 +74,42 @@ fn start_game(mode : u8){
 		_terminal.clear(ClearType::All);
 		_gui.draw_main_menu();	
 				
+		
 		//main game loop
 		loop {		
-			let result_command = Command::get(&state);
+
 			
+			let _input_command = Command::get(&state);
+			
+			let mut text = String::new();
+			match _input_command {
+			Command::Attack(target) => {
+				text = String::from("attack")
+			}
+			Command::Examine(target) => {
+				
+			}
+			Command::Status => {
+				text = String::from("status")
+			
+			}
+			Command::Help => {
+			
+			}
+			Command::Debug(DebugCommand::Remove(target)) => {
+			}
+			_ => {
+				text = String::from("nothing")
+			}
+		}
+				
+			
+			let text = draw_text {
+			text : text
+			};
 			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
-			input_command(&state, result_command, &_gui);
-			_gui.draw(&state);
+			input_command(&state, _input_command, &_gui);
+			_gui.draw(&state,text);
 			
 		}
 	}
@@ -111,13 +140,13 @@ fn get_mode_number() -> u8{
 
 fn create_creatures_structs() -> Vec<Creature> {
 	let human_warrior = Creature {
-		name: String::from("human_warrior"),
+		name: String::from("Thanos"),
 		health: 25,
 		damage: 4,
 		features: vec![]
 	};
 	let goblin = Creature {
-		name: String::from("goblin"),
+		name: String::from("avenger"),
 		health: 12,
 		damage: 2,
 		features: vec![Feature::Aggression]
