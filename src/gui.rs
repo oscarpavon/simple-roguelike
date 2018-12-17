@@ -1,13 +1,15 @@
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
 use std::process::Command;
+use crossterm::terminal::*;
 use std::str::FromStr;
 use crate::GameState;
 pub struct GUI {
     pub height : u16,
     pub width : u16,
     pub cursor_position_x : u16,
-    pub cursor_position_y : u16
+    pub cursor_position_y : u16,
+    pub show_help_screen : bool
 }
 pub struct draw_text {
     pub text : String
@@ -43,8 +45,13 @@ impl GUI {
         _cursor.goto(15,15);
         println!("{}",texts.text);
 
-       self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
-
+       self.print_in_game_camera(String::from("Press '1' key to see help"), Color::Green, 1, self.height-4);
+        if self.show_help_screen {
+             let terminal = terminal();
+            terminal.clear(ClearType::All);
+            self.draw_help_screen();
+           
+        }
        
        _cursor.goto(0, self.height);//input command position
        _cursor.goto(self.cursor_position_x, self.cursor_position_y);
@@ -55,7 +62,7 @@ impl GUI {
     pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
         let _cursor = cursor();
         _cursor.goto(pos_x, pos_y);
-        println!("{}",style(text_to_write_in_game_window).with(_color));//TODO: add color features
+        println!("{}",style(text_to_write_in_game_window).with(_color));
        
     }
 
@@ -167,6 +174,13 @@ impl GUI {
 
         _cursor.goto(0,self.height-2);
         println!("Command:")
+    }
+
+    pub fn draw_help_screen(& self){
+        self.print_in_game_camera(String::from("- Use h j k l to move the cursor"), Color::Green, 1, self.height/2-4);
+        self.print_in_game_camera(String::from("- Press 'w' to select weapon"), Color::Green, 1, self.height/2-3);
+         self.print_in_game_camera(String::from("- Press 's' to select enemies"), Color::Green, 1, self.height/2-2);
+          self.print_in_game_camera(String::from("- Press 'a' to atack selected enemy"), Color::Green, 1, self.height/2-1);
     }
 }
 

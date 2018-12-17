@@ -23,15 +23,19 @@ use crate::gui::*;
 
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
 const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
-const GUI_DISABLED_MODE : u8 = 3; //TODO
+const GUI_DISABLED_MODE : u8 = 3; //run the game in legacy mode
 
 fn main() {
 	println!("Starting game..");
 	
-	match get_mode_number() {
+	match get_game_start_mode_number() {
 		GUI_DEBUG_MODE => {
 			println!("Starting in DEBUG mode");
 			start_game(GUI_DEBUG_MODE);
+		}
+		GUI_DISABLED_MODE => {
+			println!("Starting in game command mode");
+			start_game(GUI_DISABLED_MODE);
 		}
 		_ => {
 			println!("Starting in NORMAL mode");
@@ -59,7 +63,8 @@ fn start_game(mode : u8){
 		height : _height,
 		width : _width,
 		cursor_position_x : 0,
-		cursor_position_y : 0
+		cursor_position_y : 0,
+		show_help_screen : false
 		
 	};
 
@@ -83,6 +88,10 @@ fn start_game(mode : u8){
 		
 		//main game loop
 		loop {		
+			let (_width, _height) = _terminal.terminal_size();//update console size
+			_gui.width = _width;
+			_gui.height = _height;
+
 			input_control(&mut _gui);
 			let mut text = String::from("test");
 			let mut texts_to_draw_in_gui = draw_text {
@@ -98,7 +107,7 @@ fn start_game(mode : u8){
 	
 }
 
-fn get_mode_number() -> u8{
+fn get_game_start_mode_number() -> u8{
 	let args : Vec<_> = env::args().collect(); //read input argument
 	
 	let mut imput_argument = String::from("");
@@ -106,16 +115,21 @@ fn get_mode_number() -> u8{
 		imput_argument = args[1].to_owned();
 	}
 	
-	let _debug_string_argument = String::from("-d");
+	let _debug_open_new_console_string_argument = String::from("-d");
+	let _debug_game_console_gui_disabled_string_argument = String::from("-c");
 
 	let mut mode_number = 0;
-
-	if imput_argument == _debug_string_argument {
-		mode_number = GUI_DEBUG_MODE;
+	match imput_argument {
+		_debug_game_console_gui_disabled_string_argument => {
+			mode_number = GUI_DISABLED_MODE			
+		}
+		_debug_open_new_console_string_argument => {
+			mode_number = GUI_DEBUG_MODE;
+		}
+		_ => mode_number = GUI_NORMAL_MODE		
+		
 	}
-	else{
-		mode_number = GUI_NORMAL_MODE;
-	}
+	
 	mode_number
 }
 
@@ -216,6 +230,27 @@ fn input_control(gui : &mut GUI) {
 				'j' => gui.cursor_position_y += 1,
 				'h' => gui.cursor_position_x -= 1,
 				'l' => gui.cursor_position_x += 1,
+				'e' => {//enemies select position
+					gui.cursor_position_x = 12;
+					gui.cursor_position_y = 6;
+				}
+				'w' => {//weapons select position
+					gui.cursor_position_x = 30;
+					gui.cursor_position_y = 6;
+				}
+				's' => {//select
+					gui.cursor_position_x = 12;
+					gui.cursor_position_y = 6;
+				}
+				'1' => {//help
+					if gui.show_help_screen == false{
+						gui.show_help_screen = true;
+					}
+					else{
+						gui.show_help_screen = false;
+					}
+					
+				}
 				_ => {}
 
 			}
