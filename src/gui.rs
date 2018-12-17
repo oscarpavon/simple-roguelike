@@ -36,6 +36,7 @@ impl GUI {
 
        self.draw_status_bar(_game);
        self.draw_enemies_names(_game);
+       self.draw_weapons_list(_game);
        self.print_in_game_camera(String::from("Enemies:"), Color::Green, 0, 2);    
 
         _cursor.goto(15,15);
@@ -84,8 +85,23 @@ impl GUI {
         }
     }
 
+    pub fn draw_weapons_list(& self, _game : &GameState){
+             let _cursor = cursor();
+             self.print_in_game_camera(String::from("Weapons"),Color::Green,30,5);
+
+            let weapons_list = &_game.weapon_manager.availible_weapons;
+            for i in 0..weapons_list.len() {
+                //self.print_in_game_camera(weapons_list[i].name,Color::Green,30,std::convert::Into<u16>(i));
+                let weapon_name = &_game.weapon_manager.availible_weapons[i].name;
+                let number = 6 + i;
+                _cursor.goto(30, number as u16);
+                println!("{}",weapon_name);
+                
+            }
+
+    }
     pub fn draw_enemies_names(& self, _game : &GameState){
-            //TODO
+          
              let _cursor = cursor();
             self.print_in_game_camera(String::from("Health"),Color::Green,20,5);
 

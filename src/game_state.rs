@@ -3,11 +3,15 @@ use crossterm::style::{Color, style};
 use crate::creatures::*;
 use crate::features::{Feature, aggressive_system, player_system};
 
+
+use crate::weapons::*;
+
 pub const PLAYER_ID: CreatureId = 0;
 
 pub struct GameState {
 	pub creatures: CreatureMap,
-	pub aggressive: Vec<CreatureId>
+	pub aggressive: Vec<CreatureId>,
+	pub weapon_manager : WeaponManager
 }
 
 // just used for determining console output
@@ -30,7 +34,8 @@ impl GameState {
 	pub fn new(player: Creature) -> GameState {
 		let mut state = GameState {
 			creatures: CreatureMap::new(),
-			aggressive: Vec::new()
+			aggressive: Vec::new(),
+			weapon_manager: WeaponManager::new()
 		};
 		state.creatures.add(player);
 		state

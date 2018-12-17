@@ -3,6 +3,7 @@ mod creatures;
 mod commands;
 mod features;
 mod gui;
+mod weapons;
 
 use std::env; //for input argument
 
@@ -15,7 +16,7 @@ use crate::features::Feature;
 use crate::game_state::{GameState, PLAYER_ID};
 use crate::creatures::*;
 use crate::commands::*;
-
+use crate::weapons::Weapon;
 use crate::gui::*;
 
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
@@ -49,7 +50,7 @@ fn start_game(mode : u8){
 	state.add_register(creatures[1].clone());
 	state.add_register(creatures[1].clone());
 
-	
+	create_weapons(&mut state);
 	
 	let _gui = GUI {		
 		height : _height,
@@ -199,3 +200,21 @@ status: Show your character's status and remaining enemies."
 	
 }
 
+fn create_weapons(_state : &mut GameState){
+	let mut big_sword = Weapon {
+		name : String::from("big_sword"),
+		damage : 6
+	};
+	let stick = Weapon {
+		name : String::from("stick"),
+		damage : 2
+	};
+	let snife = Weapon {
+		name : String::from("snife"),
+		damage : 4
+	};
+
+	_state.weapon_manager.add_weapon(big_sword.clone());
+	_state.weapon_manager.add_weapon(stick.clone());
+	_state.weapon_manager.add_weapon(snife.clone());
+}
