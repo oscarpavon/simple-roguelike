@@ -1,7 +1,8 @@
 #[derive(Clone)]
 pub struct Weapon {
     pub name: String,
-    pub damage: u16
+    pub damage: u16,
+    pub is_used : bool
     
 }
 pub struct WeaponManager {

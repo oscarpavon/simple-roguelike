@@ -94,8 +94,14 @@ impl GUI {
                 //self.print_in_game_camera(weapons_list[i].name,Color::Green,30,std::convert::Into<u16>(i));
                 let weapon_name = &_game.weapon_manager.availible_weapons[i].name;
                 let number = 6 + i;
-                _cursor.goto(30, number as u16);
-                println!("{}",weapon_name);
+                _cursor.goto(30, number as u16);  
+                //println!("{}",weapon_name);              
+                if _game.weapon_manager.availible_weapons[i].is_used{
+                    println!("->{}<-",weapon_name);
+                }else{
+                    println!("{}",weapon_name);
+                }
+                
                 
             }
 

@@ -203,15 +203,18 @@ status: Show your character's status and remaining enemies."
 fn create_weapons(_state : &mut GameState){
 	let mut big_sword = Weapon {
 		name : String::from("big_sword"),
-		damage : 6
+		damage : 6,
+		is_used : true
 	};
 	let stick = Weapon {
 		name : String::from("stick"),
-		damage : 2
+		damage : 2,
+		is_used : false
 	};
 	let snife = Weapon {
 		name : String::from("snife"),
-		damage : 4
+		damage : 4,
+		is_used : false
 	};
 
 	_state.weapon_manager.add_weapon(big_sword.clone());
