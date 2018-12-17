@@ -60,16 +60,33 @@ fn start_game(mode : u8){
 	state.add_register(creatures[1].clone());
 	state.add_register(creatures[1].clone());
 
+	let mut items_menu = Vec::new();
+	let item_one = String::from("Attack");
+	let item_two = String::from("Examine");
+	let item_three = String::from("Use");
+	items_menu.push(item_one);
+	items_menu.push(item_two);
+	items_menu.push(item_three);
+
 	create_weapons(&mut state);
+	let new_float_menu = FloatMenu{
+		active : false,
+		selected_item : 0,
+		items_string_to_draw : items_menu,
+		position_x : 45,
+		position_y : 8
+	};
 	
 	let mut _gui = GUI {		
 		height : _height,
 		width : _width,
+		center_x : 0,
+		center_y : 0,
 		cursor_position_x : 0,
 		cursor_position_y : 0,
 		show_help_screen : false,
-		show_message_box : false
-		
+		show_message_box : false,
+		float_menu_to_draw : new_float_menu
 	};
 
 	let _input = input();
@@ -86,7 +103,7 @@ fn start_game(mode : u8){
 		}
 	}else{
 
-		_terminal.clear(ClearType::All);
+		_gui.clear();
 		_gui.draw_main_menu();	
 				
 		
@@ -95,13 +112,15 @@ fn start_game(mode : u8){
 			let (_width, _height) = _terminal.terminal_size();//update console size
 			_gui.width = _width;
 			_gui.height = _height;
+			_gui.center_x = _gui.width / 2;
+			_gui.center_y = _gui.height / 2;
 
 			input_control(&mut _gui);
 			let mut text = String::from("test");
 			let mut texts_to_draw_in_gui = draw_text {
 				text : text
 				};
-			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
+			_gui.clear();
 			//input_command(&state, _input_command, &_gui);
 			_gui.draw(&state,texts_to_draw_in_gui);
 			
@@ -230,8 +249,25 @@ fn input_control(gui : &mut GUI) {
 		Ok(s) => {
 			
 			match s {
-				'k' => gui.cursor_position_y -= 1,
-				'j' => gui.cursor_position_y += 1,
+				'k' => {
+					if gui.float_menu_to_draw.active == true {
+						//if gui.float_menu_to_draw.selected_item == gui.float_menu_to_draw.items_string_to_draw.len() as u8{
+							
+							gui.float_menu_to_draw.selected_item -= 1;
+						
+					}else{
+						gui.cursor_position_y -= 1
+					}
+					
+				}
+				'j' => {
+					if gui.float_menu_to_draw.active == true {
+						gui.float_menu_to_draw.selected_item += 1;
+					}else{
+						gui.cursor_position_y += 1
+					}
+					
+				}
 				'h' => gui.cursor_position_x -= 1,
 				'l' => gui.cursor_position_x += 1,
 				'e' => {//enemies select position
@@ -245,6 +281,12 @@ fn input_control(gui : &mut GUI) {
 				's' => {//select
 					gui.cursor_position_x = 12;
 					gui.cursor_position_y = 6;
+					if gui.float_menu_to_draw.active == false {
+						gui.float_menu_to_draw.active = true;
+					}else{
+						gui.float_menu_to_draw.active = false;
+					}
+					
 				}
 				'1' => {//help
 					if gui.show_help_screen == false{

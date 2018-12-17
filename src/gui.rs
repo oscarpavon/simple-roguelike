@@ -7,10 +7,20 @@ use crate::GameState;
 pub struct GUI {
     pub height : u16,
     pub width : u16,
+    pub center_x : u16,
+    pub center_y : u16,
     pub cursor_position_x : u16,
     pub cursor_position_y : u16,
     pub show_help_screen : bool,
-    pub show_message_box : bool
+    pub show_message_box : bool,
+    pub float_menu_to_draw : FloatMenu
+}
+pub struct FloatMenu {
+    pub active : bool,
+    pub selected_item : u8, //only 256 items
+    pub items_string_to_draw : Vec<String>,
+    pub position_x : u16,
+    pub position_y : u16
 }
 pub struct draw_text {
     pub text : String
@@ -45,6 +55,8 @@ impl GUI {
 
         _cursor.goto(15,15);
         println!("{}",texts.text);
+
+        self.draw_float_menu(&self.float_menu_to_draw);
 
        self.print_in_game_camera(String::from("Press '1' key to see help"), Color::Green, 1, self.height-4);
         if self.show_help_screen {
@@ -86,7 +98,7 @@ impl GUI {
         println!("{}", style("\n and must defeat all enemies!\n")
                     .with(Color::Green));
 
-        self.print_in_game_camera(String::from("-->Play<--"), Color::Green, self.width/2-6, self.height - 8);//concept
+        self.print_in_game_camera(String::from("-->New Game<--"), Color::Green, self.width/2-6, self.height - 8);//concept
         self.print_in_game_camera(String::from("Exit"), Color::Green, self.width/2-3, self.height - 7);
 
         for i in 1..self.height-3 {
@@ -195,6 +207,23 @@ impl GUI {
          self.print_in_game_camera(String::from("no"), Color::Green, self.width/2 + 4, self.height/2-3);
           
           true
+    }
+
+    pub fn draw_float_menu(&self, menu_to_draw : &FloatMenu){
+        if menu_to_draw.active {
+            for i in 0..menu_to_draw.items_string_to_draw.len(){
+
+            let text_to_draw = &menu_to_draw.items_string_to_draw[i];
+            let mut  color = Color::Red;
+            if i == menu_to_draw.selected_item as usize{
+                color = Color::DarkYellow;
+            }
+            
+            self.print_in_game_camera(text_to_draw.to_string(), color, menu_to_draw.position_x, menu_to_draw.position_y + {i as u16});
+            }
+        }
+        
+        
     }
 
     pub fn clear(&self){
