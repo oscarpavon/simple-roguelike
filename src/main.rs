@@ -78,37 +78,38 @@ fn start_game(mode : u8){
 		//main game loop
 		loop {		
 
-			
+			let mut text = String::new();
 			let _input_command = Command::get(&state);
 			
-			let mut text = String::new();
+			
 			match _input_command {
-			Command::Attack(target) => {
-				text = String::from("attack")
-			}
-			Command::Examine(target) => {
+				Command::Attack(target) => {
+					&state.hit(0, 1);
+					state.hit(1,0);
+				}
+				Command::Examine(target) => {
+					
+				}
+				Command::Status => {
+					text = String::from("status")
 				
+				}
+				Command::Help => {
+				
+				}
+				Command::Debug(DebugCommand::Remove(target)) => {
+				}
+				Command::Dummy => {
+					text = String::from("test command print =(")
+				}
 			}
-			Command::Status => {
-				text = String::from("status")
-			
-			}
-			Command::Help => {
-			
-			}
-			Command::Debug(DebugCommand::Remove(target)) => {
-			}
-			_ => {
-				text = String::from("nothing")
-			}
-		}
 				
 			
-			let text = draw_text {
+			let mut text = draw_text {
 			text : text
 			};
 			_terminal.clear(ClearType::All);//clear terminal before draw but produce tearing
-			input_command(&state, _input_command, &_gui);
+			//input_command(&state, _input_command, &_gui);
 			_gui.draw(&state,text);
 			
 		}
@@ -146,7 +147,7 @@ fn create_creatures_structs() -> Vec<Creature> {
 		features: vec![]
 	};
 	let goblin = Creature {
-		name: String::from("avenger"),
+		name: String::from("goblin"),
 		health: 12,
 		damage: 2,
 		features: vec![Feature::Aggression]

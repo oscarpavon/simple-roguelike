@@ -35,20 +35,21 @@ impl Command {
 		let mut input_string_buffer = String::new();
 
 	
-			stdin.read_line(&mut input_string_buffer).unwrap();
+            stdin.read_line(&mut input_string_buffer).unwrap();
 
 
 			let parts: Vec<&str> = input_string_buffer.trim().split(' ').collect();
 
             // The repetition of parts.len() > 1 is acknowledged but is necessary due to one-worded
             // commands, such as 'status' or 'help'
-
+             println!("{}",parts[0]);
 			match parts[0] {
+               
 				"attack" => {
 					if parts.len() > 1 {
 						if let Some(target) = state.creatures.find(parts[1]) {
                             if target != PLAYER_ID {
-                                Command::Attack(target);
+                                return Command::Attack(target);
                             } else {
                                 println!("{}", style("Don't attack yourself!")
                                             .with(Color::DarkRed))
@@ -67,8 +68,8 @@ impl Command {
                     println!("{}", style("Please write a correct target: ex: 'examine goblin'.")
                                    .with(Color::DarkRed))
 				}
-				"status" => {
-					Command::Status;
+				"status" => {                   
+					Command::Status;                    
 				}
 				"help" => {
     				Command::Help;

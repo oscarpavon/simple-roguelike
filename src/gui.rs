@@ -35,9 +35,10 @@ impl GUI {
         let _cursor = cursor();
 
        self.draw_status_bar(_game);
-       self.print_in_game_camera(String::from("Creatures:"), Color::Green, 0, 2);    
+       self.draw_enemies_names(_game);
+       self.print_in_game_camera(String::from("Enemies:"), Color::Green, 0, 2);    
 
-        _cursor.goto(8,8);
+        _cursor.goto(15,15);
         println!("{}",texts.text);
 
        self.print_in_game_camera(String::from("Type 'help' to see the available commands."), Color::Green, 1, self.height-4);
@@ -51,7 +52,8 @@ impl GUI {
     pub fn print_in_game_camera(&self, text_to_write_in_game_window : String, _color : Color, pos_x : u16 , pos_y : u16) {
         let _cursor = cursor();
         _cursor.goto(pos_x, pos_y);
-        println!("{}",text_to_write_in_game_window);//TODO: add color features
+        println!("{}",style(text_to_write_in_game_window).with(_color));//TODO: add color features
+       
     }
 
 
@@ -82,8 +84,31 @@ impl GUI {
         }
     }
 
-    pub fn draw_enemies_names(){
+    pub fn draw_enemies_names(& self, _game : &GameState){
             //TODO
+             let _cursor = cursor();
+            self.print_in_game_camera(String::from("Health"),Color::Green,20,5);
+
+            let _player = _game.creatures.get(1)
+            .expect("Game logic error: the player is dead and the game is still running.");
+
+
+            //Stats
+            let player_health = _player.health;  
+                
+            let player_name = &_player.name;//string variables need be reference
+
+            let demage_per_hit = _player.damage;   
+
+                //Draw stats
+            _cursor.goto(10, 6);	 
+            println!("{}", style(format!("{}",player_name)) 
+                        .with(Color::White));
+            //Draw health
+            _cursor.goto(20, 6);	
+            println!("{}", style(format!("{}%", player_health)) //player health
+                        .with(Color::White));
+
     }
 
     fn draw_status_bar(& self, _game : &GameState){
