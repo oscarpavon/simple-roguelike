@@ -14,6 +14,7 @@ use crossterm::input;
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
 use crate::input::*;
+use std::io;
 use std::process;
 
 use crate::features::Feature;
@@ -330,7 +331,18 @@ fn input_control(gui : &mut GUI) {
 					}else{
 						gui.show_main_menu = true;
 					}
-				}				
+				}	
+				':' => {//command mode
+					
+						cursor().goto(0, gui.height);
+						print!("{}",':');
+						cursor().goto(1, gui.height);
+						let mut input_string_buffer = String::new();
+						
+						io::stdin().read_line(&mut input_string_buffer);
+						
+					
+				}			
 				_ => {}
 
 			}

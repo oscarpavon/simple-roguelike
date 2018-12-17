@@ -248,10 +248,14 @@ impl GUI {
     }
 
     pub fn draw_help_screen(& self){
-        self.print_in_game_camera(String::from("- Use h j k l to move the cursor"), Color::Green, 1, self.height/2-4);
-        self.print_in_game_camera(String::from("- Press 'w' to select weapon"), Color::Green, 1, self.height/2-3);
-         self.print_in_game_camera(String::from("- Press 's' to select enemies"), Color::Green, 1, self.height/2-2);
-          self.print_in_game_camera(String::from("- Press 'a' to atack selected enemy"), Color::Green, 1, self.height/2-1);
+    self.print_in_game_camera(String::from("- Use h j k l to move the cursor"), Color::Green, 1, self.height/2-4);
+    self.print_in_game_camera(String::from("- Press 'w' to select weapon"), Color::Green, 1, self.height/2-3);
+    self.print_in_game_camera(String::from("- Press 's' to select enemies"), Color::Green, 1, self.height/2-2);
+    self.print_in_game_camera(String::from("- Press 'a' to atack selected enemy"), Color::Green, 1, self.height/2-1);
+    self.print_in_game_camera(String::from("- Press 'q' to quit"), Color::Green, 1, self.height/2);
+    self.print_in_game_camera(String::from("- Press ':' to command mode"), Color::Green, 1, self.height/2+1);
+    self.print_in_game_camera(String::from("- Press 'm' to back to the main menu"), Color::Green, 1, self.height/2+2);
+
     }
 
     pub fn draw_message_box(& self) -> bool { //yes or no
