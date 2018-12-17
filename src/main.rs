@@ -117,6 +117,8 @@ fn start_game(mode : u8){
 
 			if _gui.show_main_menu{
 				_gui.draw_main_menu();
+				let player_name = _gui.get_player_name_from_input();
+				state.creatures.get_mut(0).expect("sd").name = player_name;
 			}
 			
 

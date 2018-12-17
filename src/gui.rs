@@ -5,6 +5,8 @@ use crossterm::terminal::*;
 use std::str::FromStr;
 use crate::GameState;
 use crossterm::input;
+use std::io;
+use std::io::prelude::*;
 
 pub struct GUI {
     pub height : u16,
@@ -58,7 +60,7 @@ pub struct draw_text {
 
 impl GUI {
    
-    pub fn draw(& self, _game : &GameState, texts : draw_text){
+    pub fn draw(& mut self, _game : &GameState, texts : draw_text){
        if self.show_main_menu {
            self.draw_main_menu();
        }
@@ -106,7 +108,7 @@ impl GUI {
        _cursor.goto(self.cursor_position_x, self.cursor_position_y);
     }
 
-    pub fn draw_main_menu(&self){
+    pub fn draw_main_menu(&mut self){
         for x in 0..self.width {
              self.print_in_game_camera(String::from("x"), Color::Green, x, 1);
         }
@@ -146,8 +148,23 @@ impl GUI {
          self.draw_float_menu(&new_float_menu);
          new_float_menu.update();
          self.draw_float_menu(&new_float_menu);
+
+         self.print_in_game_camera(String::from("Write your nickname: "), Color::Green, self.center_x-30, self.height-5);
+         
+
     }
 
+    pub fn get_player_name_from_input(&mut self) -> String{
+        cursor().goto(self.center_x, self.height-5);
+         let mut input_string_buffer = String::new();
+         
+         io::stdin().read_line(&mut input_string_buffer);
+          let string_copy = input_string_buffer.clone();
+        //self.print_in_game_camera(input_string_buffer, Color::Green, self.center_x-30, self.height-8);
+        self.show_main_menu = false;
+       
+        string_copy
+    }
     pub fn draw_weapons_list(& self, _game : &GameState){
              let _cursor = cursor();
              self.print_in_game_camera(String::from("Weapons"),Color::Green,30,5);
