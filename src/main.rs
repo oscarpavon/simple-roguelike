@@ -4,6 +4,7 @@ mod commands;
 mod features;
 mod gui;
 mod weapons;
+mod point;
 
 use std::env; //for input argument
 
@@ -22,6 +23,7 @@ use crate::creatures::*;
 use crate::commands::*;
 use crate::weapons::Weapon;
 use crate::gui::*;
+use crate::point::Point;
 
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
 const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
@@ -29,7 +31,7 @@ const GUI_DISABLED_MODE : u8 = 3; //run the game in legacy mode
 
 fn main() {
 	println!("Starting game..");
-	
+
 	match get_game_start_mode_number() {
 		GUI_DEBUG_MODE => {
 			println!("Starting in DEBUG mode");
@@ -44,13 +46,13 @@ fn main() {
 			start_game(GUI_NORMAL_MODE);
 		}
 	}
-	
+
 }
 
-fn start_game(mode : u8){	
-	
+fn start_game(mode : u8){
+
 	let _terminal = terminal();
-	
+
 	let (_width, _height) = _terminal.terminal_size();
 
 	let creatures =  create_creatures_structs();
@@ -70,23 +72,17 @@ fn start_game(mode : u8){
 
 	create_weapons(&mut state);
 	let new_float_menu = FloatMenu{
-		active : false,
-		selected_item : 0,
-		items_string_to_draw : items_menu,
-		position_x : 45,
-		position_y : 8
+		active: false,
+		selected_item: 0,
+		item_vec: items_menu,
+		position: Point::new(45,8),
 	};
-	
-	let mut _gui = GUI {		
-		height : _height,
-		width : _width,
-		center_x : 0,
-		center_y : 0,
-		cursor_position_x : 0,
-		cursor_position_y : 0,
-		show_help_screen : false,
-		show_message_box : false,
-		float_menu_to_draw : new_float_menu
+
+	let mut _gui = GUI {
+		size: Point::new(_width, _height),
+		state: GUIState::None,
+		cursor: Point::empty(),
+		float_menu: new_float_menu
 	};
 
 	let _input = input();
@@ -95,64 +91,54 @@ fn start_game(mode : u8){
 	if mode == GUI_DEBUG_MODE {
 		_gui.create(); 										//open the new terminal a execute the game without argument
 		loop {
-			
+
 			match _input.read_line() {//this is for pause purpose
 				Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
 				Err(e) => println!("error: {}", e),
 			}
 		}
-	}else{
-
+	} else {
 		_gui.clear();
-		_gui.draw_main_menu();	
-				
-		
+		_gui.draw_main_menu();
+
 		//main game loop
-		loop {		
+		loop {
 			let (_width, _height) = _terminal.terminal_size();//update console size
-			_gui.width = _width;
-			_gui.height = _height;
-			_gui.center_x = _gui.width / 2;
-			_gui.center_y = _gui.height / 2;
+			_gui.size = Point::new(_width, _height);
 
 			input_control(&mut _gui);
-			let mut text = String::from("test");
-			let mut texts_to_draw_in_gui = draw_text {
-				text : text
-				};
 			_gui.clear();
 			//input_command(&state, _input_command, &_gui);
-			_gui.draw(&state,texts_to_draw_in_gui);
-			
+			_gui.draw(&state, DrawText::new("test"));
 		}
 	}
-	
-	
+
+
 }
 
 fn get_game_start_mode_number() -> u8{
 	let args : Vec<_> = env::args().collect(); //read input argument
-	
+
 	let mut imput_argument = String::from("");
 	if args.len() > 1 {
 		imput_argument = args[1].to_owned();
 	}
-	
+
 	let _debug_open_new_console_string_argument = String::from("-d");
 	let _debug_game_console_gui_disabled_string_argument = String::from("-c");
 
 	let mut mode_number = 0;
 	match imput_argument {
 		_debug_game_console_gui_disabled_string_argument => {
-			mode_number = GUI_DISABLED_MODE			
+			mode_number = GUI_DISABLED_MODE
 		}
 		_debug_open_new_console_string_argument => {
 			mode_number = GUI_DEBUG_MODE;
 		}
-		_ => mode_number = GUI_NORMAL_MODE		
-		
+		_ => mode_number = GUI_NORMAL_MODE
+
 	}
-	
+
 	mode_number
 }
 
@@ -172,12 +158,12 @@ fn create_creatures_structs() -> Vec<Creature> {
 
 	let mut created_creatures = Vec::new();
 	created_creatures.push(human_warrior);
-	created_creatures.push(goblin);	
+	created_creatures.push(goblin);
 
-	created_creatures 
+	created_creatures
 }
 
-fn input_command(state: &GameState, _input_command : Command, gui : &GUI){		
+fn input_command(state: &GameState, _input_command : Command, gui : &GUI){
 
 	match _input_command {
 			Command::Attack(target) => {
@@ -191,10 +177,10 @@ fn input_command(state: &GameState, _input_command : Command, gui : &GUI){
 				println!("{}", stylized);
 			}
 			Command::Status => {
-				
+
 				//let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
 				//println!("{}", stylized);
-				gui.print_in_game_camera(String::from("status"), Color::DarkBlue, 5, 5);
+				gui.print(DrawText::new("status").with_color(Color::DarkBlue).with_pos(5, 5));
 				//gui.text = String::from("test");
 			}
 			Command::Help => {
@@ -212,8 +198,8 @@ status: Show your character's status and remaining enemies."
 				//
 			}
 		}
-		
-	
+
+
 }
 
 fn create_weapons(_state : &mut GameState){
@@ -239,90 +225,82 @@ fn create_weapons(_state : &mut GameState){
 }
 
 fn input_control(gui : &mut GUI) {
-	let mut input = input();
-
-	
 	let _cursor = cursor();
 
-	
-	match input.read_char() {
+	match input().read_char() {
 		Ok(s) => {
-			
 			match s {
 				'k' => {
-					if gui.float_menu_to_draw.active == true {
-						//if gui.float_menu_to_draw.selected_item == gui.float_menu_to_draw.items_string_to_draw.len() as u8{
-							
-							gui.float_menu_to_draw.selected_item -= 1;
-						
-					}else{
-						gui.cursor_position_y -= 1
+					if gui.float_menu.active == true {
+						//if gui.float_menu.selected_item == gui.float_menu.items_string_to_draw.len() as u8{
+
+							gui.float_menu.selected_item -= 1;
+
+					} else {
+						gui.cursor.y -= 1
 					}
-					
+
 				}
 				'j' => {
-					if gui.float_menu_to_draw.active == true {
-						gui.float_menu_to_draw.selected_item += 1;
+					if gui.float_menu.active == true {
+						gui.float_menu.selected_item += 1;
 					}else{
-						gui.cursor_position_y += 1
+						gui.cursor.y += 1
 					}
-					
+
 				}
-				'h' => gui.cursor_position_x -= 1,
-				'l' => gui.cursor_position_x += 1,
+				'h' => gui.cursor.x -= 1,
+				'l' => gui.cursor.x += 1,
 				'e' => {//enemies select position
-					gui.cursor_position_x = 12;
-					gui.cursor_position_y = 6;
+					gui.cursor.x = 12;
+					gui.cursor.y = 6;
 				}
 				'w' => {//weapons select position
-					gui.cursor_position_x = 30;
-					gui.cursor_position_y = 6;
+					gui.cursor.x = 30;
+					gui.cursor.y = 6;
 				}
 				's' => {//select
-					gui.cursor_position_x = 12;
-					gui.cursor_position_y = 6;
-					if gui.float_menu_to_draw.active == false {
-						gui.float_menu_to_draw.active = true;
-					}else{
-						gui.float_menu_to_draw.active = false;
+					gui.cursor.x = 12;
+					gui.cursor.y = 6;
+					gui.float_menu.active = if gui.float_menu.active == false {
+						true
+					} else {
+						false
 					}
-					
+
 				}
-				'1' => {//help
-					if gui.show_help_screen == false{
-						gui.show_help_screen = true;
-					}
-					else{
-						gui.show_help_screen = false;
-					}
-					
+				'1' => {
+					gui.state = if gui.state != GUIState::HelpScreen {
+						GUIState::HelpScreen
+					} else {
+						GUIState::None
+					};
 				}
-				'q' => {//quit
-					if gui.show_message_box == false{
-						gui.show_message_box = true;
-					}
-					else{
-						gui.show_message_box = false;
-					}
+				'q' => {
+					gui.state = if gui.state != GUIState::MessageBox {
+						GUIState::MessageBox
+					} else {
+						GUIState::None
+					};
 				}
 				'y' => {//yes
-					if gui.show_message_box == true{						
-						gui.clear();
-						process::exit(0x0100); //on linux but 0x0256 on Windows :TODO
-					}					
+					match gui.state {
+						GUIState::MessageBox => {
+							gui.clear();
+							process::exit(0x0100);
+						}
+						_ => ()
+					}
 				}
-				'n' => {//no
-					if gui.show_message_box == true{
-						gui.show_message_box = false;
-					}	
-				}		
+				'n' => {
+					match gui.state {
+						GUIState::MessageBox => gui.state = GUIState::None,
+						_ => ()
+					}
+				}
 				_ => {}
-
 			}
-			
-			
-			
-			},
-		Err(e) => println!("char error : {}", e),
+		}
+		Err(e) => println!("char error : {}", e)
 	}
 }
