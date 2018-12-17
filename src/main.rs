@@ -123,7 +123,7 @@ fn start_game(mode : u8){
 			}
 			
 
-			input_control(&mut _gui);
+			input_control(&state, &mut _gui);
 			let mut text = String::from("test");
 			let mut texts_to_draw_in_gui = draw_text {
 				text : text
@@ -186,7 +186,7 @@ fn create_creatures_structs() -> Vec<Creature> {
 	created_creatures 
 }
 
-fn input_command(state: &GameState, _input_command : Command, gui : &GUI){		
+fn input_command(state: &GameState, _input_command : Command){		
 
 	match _input_command {
 			Command::Attack(target) => {
@@ -203,7 +203,7 @@ fn input_command(state: &GameState, _input_command : Command, gui : &GUI){
 				
 				//let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
 				//println!("{}", stylized);
-				gui.print_in_game_camera(String::from("status"), Color::DarkBlue, 5, 5);
+				//gui.print_in_game_camera(String::from("status"), Color::DarkBlue, 5, 5);
 				//gui.text = String::from("test");
 			}
 			Command::Help => {
@@ -216,6 +216,10 @@ status: Show your character's status and remaining enemies."
 			Command::Debug(DebugCommand::Remove(target)) => {
 				//let creature: Creature = state.creatures.remove(target);
 				//println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
+			}
+			Command::Exit => {
+				process::exit(0x0100); //on linux but 0x0256 on Windows :TODO
+
 			}
 			_ => {
 				//
@@ -247,7 +251,7 @@ fn create_weapons(_state : &mut GameState){
 	_state.weapon_manager.add_weapon(snife.clone());
 }
 
-fn input_control(gui : &mut GUI) {
+fn input_control(state : &GameState , gui : &mut GUI) {
 	let mut input = input();
 
 	
@@ -340,7 +344,8 @@ fn input_control(gui : &mut GUI) {
 						let mut input_string_buffer = String::new();
 						
 						io::stdin().read_line(&mut input_string_buffer);
-						
+						let command = Command::get(state, input_string_buffer);
+						input_command(&state, command);
 					
 				}			
 				_ => {}
