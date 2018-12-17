@@ -9,7 +9,8 @@ pub struct GUI {
     pub width : u16,
     pub cursor_position_x : u16,
     pub cursor_position_y : u16,
-    pub show_help_screen : bool
+    pub show_help_screen : bool,
+    pub show_message_box : bool
 }
 pub struct draw_text {
     pub text : String
@@ -51,6 +52,11 @@ impl GUI {
             terminal.clear(ClearType::All);
             self.draw_help_screen();
            
+        }
+        if self.show_message_box {
+             let terminal = terminal();
+            terminal.clear(ClearType::All);
+            self.draw_message_box();
         }
        
        _cursor.goto(0, self.height);//input command position
@@ -181,6 +187,19 @@ impl GUI {
         self.print_in_game_camera(String::from("- Press 'w' to select weapon"), Color::Green, 1, self.height/2-3);
          self.print_in_game_camera(String::from("- Press 's' to select enemies"), Color::Green, 1, self.height/2-2);
           self.print_in_game_camera(String::from("- Press 'a' to atack selected enemy"), Color::Green, 1, self.height/2-1);
+    }
+
+    pub fn draw_message_box(& self) -> bool { //yes or no
+        self.print_in_game_camera(String::from("Do you want to quit?"), Color::Green, 1, self.height/2-4);
+        self.print_in_game_camera(String::from("yes"), Color::Green, self.width/2 - 4, self.height/2-3);
+         self.print_in_game_camera(String::from("no"), Color::Green, self.width/2 + 4, self.height/2-3);
+          
+          true
+    }
+
+    pub fn clear(&self){
+        let terminal = terminal();
+        terminal.clear(ClearType::All);
     }
 }
 

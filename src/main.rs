@@ -10,9 +10,11 @@ use std::env; //for input argument
 extern crate crossterm;
 use crossterm::terminal::*;
 use crossterm::input;
+
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
 use crate::input::*;
+use std::process;
 
 use crate::features::Feature;
 use crate::game_state::{GameState, PLAYER_ID};
@@ -45,7 +47,8 @@ fn main() {
 	
 }
 
-fn start_game(mode : u8){
+fn start_game(mode : u8){	
+	
 	let _terminal = terminal();
 	
 	let (_width, _height) = _terminal.terminal_size();
@@ -64,7 +67,8 @@ fn start_game(mode : u8){
 		width : _width,
 		cursor_position_x : 0,
 		cursor_position_y : 0,
-		show_help_screen : false
+		show_help_screen : false,
+		show_message_box : false
 		
 	};
 
@@ -251,6 +255,25 @@ fn input_control(gui : &mut GUI) {
 					}
 					
 				}
+				'q' => {//quit
+					if gui.show_message_box == false{
+						gui.show_message_box = true;
+					}
+					else{
+						gui.show_message_box = false;
+					}
+				}
+				'y' => {//yes
+					if gui.show_message_box == true{						
+						gui.clear();
+						process::exit(0x0100); //on linux but 0x0256 on Windows :TODO
+					}					
+				}
+				'n' => {//no
+					if gui.show_message_box == true{
+						gui.show_message_box = false;
+					}	
+				}		
 				_ => {}
 
 			}
