@@ -259,7 +259,7 @@ fn input_control(gui : &mut GUI) {
 					if gui.float_menu_to_draw.active == true {
 						//if gui.float_menu_to_draw.selected_item == gui.float_menu_to_draw.items_string_to_draw.len() as u8{
 							
-							gui.float_menu_to_draw.selected_item -= 1;
+						//gui.float_menu_to_draw.selected_item -= 1;
 						
 					}else{
 						gui.cursor_position_y -= 1
@@ -268,7 +268,7 @@ fn input_control(gui : &mut GUI) {
 				}
 				'j' => {
 					if gui.float_menu_to_draw.active == true {
-						gui.float_menu_to_draw.selected_item += 1;
+						//gui.float_menu_to_draw.selected_item += 1;
 					}else{
 						gui.cursor_position_y += 1
 					}

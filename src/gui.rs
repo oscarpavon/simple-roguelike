@@ -4,6 +4,7 @@ use std::process::Command;
 use crossterm::terminal::*;
 use std::str::FromStr;
 use crate::GameState;
+use crossterm::input;
 
 pub struct GUI {
     pub height : u16,
@@ -24,7 +25,31 @@ pub struct FloatMenu {
     pub position_x : u16,
     pub position_y : u16
 }
+impl FloatMenu {
+    pub fn update(&mut self){
+        let mut input = input();
 
+	
+        let _cursor = cursor();
+
+        
+        match input.read_char() {
+            Ok(s) => {
+                match s {
+                    'j' => {
+                        self.move_down();
+                    }
+                    _ => {}
+                }
+            }
+            Err(e) => {}
+        }
+			
+    }
+       pub fn move_down(&mut self){
+        self.selected_item += 1;
+    }
+}
 
 pub struct draw_text {
     pub text : String
@@ -87,29 +112,26 @@ impl GUI {
         }
         
         let mut items_menu = Vec::new();
-        let item_one = String::from("Start");
+        let item_one = String::from("New Game");
         let item_two = String::from("Exit");
         
         items_menu.push(item_one);
         items_menu.push(item_two);    
 
 
-        let new_float_menu = FloatMenu{
+        let mut new_float_menu = FloatMenu{
             active : true,
             selected_item : 0,
             items_string_to_draw : items_menu,
             position_x : self.center_x,
             position_y : self.center_y
         };
-        
-         self.draw_float_menu(&new_float_menu);
+       
+       
         self.print_in_game_camera(String::from("Simple Rusty Roguelike"), Color::Green, self.width/2-11, 4);
 
         //You're the only human warrior left and must defeat all enemies!
         
-        self.print_in_game_camera(String::from("-->New Game<--"), Color::Green, self.width/2-6, self.height - 8);//concept
-        self.print_in_game_camera(String::from("Exit"), Color::Green, self.width/2-3, self.height - 7);
-
         
 
         for i in 1..self.height-3 {
@@ -121,6 +143,9 @@ impl GUI {
         for i in 0..self.width {
              self.print_in_game_camera(String::from("x"), Color::Green, i, self.height-3);
         }
+         self.draw_float_menu(&new_float_menu);
+         new_float_menu.update();
+         self.draw_float_menu(&new_float_menu);
     }
 
     pub fn draw_weapons_list(& self, _game : &GameState){
