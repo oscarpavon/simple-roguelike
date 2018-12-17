@@ -81,8 +81,8 @@ fn start_game(mode : u8){
 	let mut _gui = GUI {
 		size: Point::new(_width, _height),
 		state: GUIState::None,
+		float_menu: new_float_menu,
 		cursor: Point::empty(),
-		float_menu: new_float_menu
 	};
 
 	let _input = input();
