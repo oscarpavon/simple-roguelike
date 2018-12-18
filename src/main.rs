@@ -320,6 +320,16 @@ fn input_command(state: &mut GameState, _input_command : Command){
 				//save name in file
 				save_file();
 			}
+			Command::NewCreature => {
+				let goblin = Creature {
+					name: String::from("goblin5"),
+					health: 12,
+					damage: 2,
+					features: vec![Feature::Aggression]
+				};
+				state.add_register(goblin.clone());
+
+			}
 			_ => {
 				//
 			}

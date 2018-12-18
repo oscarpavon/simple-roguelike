@@ -14,7 +14,8 @@ pub enum Command {
     Dummy,
     Exit,
     Save,
-    OpenFile
+    OpenFile,
+    NewCreature
 
 }
 pub enum DebugCommand {
@@ -94,6 +95,10 @@ impl Command {
 
                 "openfile" => {
                     return Command::OpenFile;
+                }
+
+                "new_creature" => {
+                    return Command::NewCreature;
                 }
                 _ => {
                     println!("{}",

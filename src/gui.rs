@@ -32,6 +32,20 @@ pub struct DrawText {
     position: Point,
     color: Color,
 }
+impl FloatMenu {
+    pub fn new() -> FloatMenu {
+        FloatMenu {
+            active: true,
+            selected_item : 0,
+            item_vec : Vec::new(),
+            position : Point::new(3,8)
+        }
+    }
+    pub fn with_array_items(mut self, list : Vec<String>) -> FloatMenu{
+        self.item_vec = list;
+        self
+    }
+}
 impl DrawText {
     pub fn new(text: &str) -> DrawText {
         DrawText {
@@ -72,10 +86,8 @@ impl GUI {
         }
         true
     }
-    pub fn draw(&mut self, _game: &mut GameState, text: DrawText){
-        
-
-       
+    pub fn draw(&mut self, _game: &mut GameState, text: DrawText){     
+      
         match self.state {
             GUIState::HelpScreen => {
                 self.clear();
@@ -99,10 +111,8 @@ impl GUI {
                  self.draw_game_interface(_game,text);
             }         
             
-        }
-        
-        //self.clear();
-
+        }     
+       
        cursor().goto(0, self.size.y);//input command position
        cursor().goto(self.cursor.x, self.cursor.y);//input command position
     }
@@ -148,13 +158,14 @@ impl GUI {
     }
 
     //horizontal line :TODO vertical 
+    //TODO: sync
     fn draw_line(&self, lengh : u16, initial_position : Point){
         for i in 0..lengh {
             self.print(DrawText::new("x").with_pos(initial_position.x+i, initial_position.y));
         }
     }
 
-   pub fn get_player_name_from_input(&mut self) -> String{
+    pub fn get_player_name_from_input(&mut self) -> String{
         cursor().goto(self.size.x/2, self.size.y-5);
         let mut input_string_buffer = String::new();
  
@@ -163,7 +174,8 @@ impl GUI {
         self.state = GUIState::None;
  
         string_copy
-     }
+    }
+
     pub fn draw_weapons_list(& self, _game : &GameState){
              let _cursor = cursor();
              self.print(DrawText::new("Weapons").with_color(Color::Green).with_pos(30, 5));
@@ -186,22 +198,19 @@ impl GUI {
     pub fn draw_enemies_names(& self, _game : &GameState){
         self.print(DrawText::new("Health").with_color(Color::Green).with_pos(20, 5));
 
-        let _player = _game.creatures.get(1)
-                .expect("The creature is dead and not exist");
+       // let _creature = _game.creatures.get(1)
+         //       .expect("The creature is dead and not exist");
+        
+        let creatures_names = _game.get_alive_creatures_name();
+
+        let mut new_float_menu = FloatMenu::new()
+                            .with_array_items(creatures_names);
 
         //Stats
-        let player_health = _player.health;
-        let player_name = &_player.name; //string variables need be reference
-
-        let _cursor = cursor();
-
-        //Draw stats
-        _cursor.goto(10, 6);
-        println!("{}", style(format!("{}", player_name)).with(Color::White));
-
-        //Draw health
-        _cursor.goto(20, 6);
-        println!("{}", style(format!("{}%", player_health)).with(Color::White));
+        //let player_health = _creature.health;
+        let player_health = 2;
+       // let player_name = &_creature.name; //string variables need be reference
+       self.draw_float_menu(&new_float_menu);
     }
 
     fn draw_status_bar(& self, _game : &GameState){
@@ -244,14 +253,16 @@ impl GUI {
                 .with_pos(1, self.center().y - 2));
         self.print(DrawText::new("- Press 'a' to atack selected enemy").with_color(Color::Green)
                 .with_pos(1, self.center().y - 1));
-        self.print(DrawText::new("- Press ':' and the write a command").with_color(Color::Green)
-                .with_pos(1, self.center().y - 1));
+        self.print(DrawText::new("- Press ':' and the write a command ex: ':exit'").with_color(Color::Green)
+                .with_pos(1, 0 ));
+        self.print(DrawText::new("- Press 'm' to open the main menu").with_color(Color::Green)
+                .with_pos(1, 1));
 
        
         self.print(DrawText::new("The available commands are:
-        attack: Hit enemies. Usage: 'attack enemy_name'
-        examine: Shows the status of a creature. Usage: 'examine enemy_name'
-        status: Show your character's status and remaining enemies.").with_color(Color::Green)
+        :attack: Hit enemies. Usage: 'attack enemy_name'
+        :examine: Shows the status of a creature. Usage: 'examine enemy_name'
+        :status: Show your character's status and remaining enemies.").with_color(Color::Green)
                 .with_pos(1, self.center().y + 3));
     }
 

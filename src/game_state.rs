@@ -135,4 +135,35 @@ impl GameState {
 
 		println!("{}", target_str);
 	}
+
+	pub fn get_alive_creatures_name(&self) -> Vec<String> {
+		let mut creatures_list_name = Vec::new();
+
+		let mut creature_string = String::new();
+
+		let mut count = 0usize;
+		// Can unwrap because alive() ASSURES that the returned creatures are alive.
+		for creature in self.creatures.alive().iter()
+											.filter(|id| **id != PLAYER_ID)
+											.map(|id| self.creatures.get(*id)
+											.expect("Game internal error: alive() function returned a None.")) {
+			creature_string.push_str(creature.name.as_str());
+			creatures_list_name.push(creature_string.clone());
+			creature_string = String::new();
+			
+			creature_string.push_str(
+				format!("{}; \n ", creature.name).as_str()
+			);
+			count += 1;
+		}
+
+		/* if count == 0 {
+			println!("=============== You WIN! ==============");
+		} else {
+			let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creatures_string)).with(Color::Red);
+			//println!("{}", stylized);
+		} */
+		creatures_list_name
+	}
+
 }
