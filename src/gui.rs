@@ -3,6 +3,7 @@ use crossterm::style::{Color, style};
 use std::process::Command;
 use crossterm::terminal::*;
 use std::str::FromStr;
+use std::io;
 
 use crate::GameState;
 use crate::point::Point;
@@ -72,10 +73,10 @@ impl GUI {
         }
         true
     }
-    pub fn draw(&self, _game: &GameState, text: DrawText){
+    pub fn draw(&mut self, _game: &mut GameState, text: DrawText){
         
 
-        self.draw_game_interface(_game,text);
+       
         match self.state {
             GUIState::HelpScreen => {
                 self.clear();
@@ -89,9 +90,18 @@ impl GUI {
             GUIState::MainMenu => {
                 self.clear();
                 self.draw_main_menu();
+                let player_name = self.get_player_name_from_input();
+                _game.creatures.get_mut(0).expect("no creature").name = player_name;
+                self.state = GUIState::None;
+               
             }
-            GUIState::None => ()
+            GUIState::None =>     {
+                 self.clear();
+                 self.draw_game_interface(_game,text);
+            }         
+            
         }
+        
         //self.clear();
 
        cursor().goto(0, self.size.y);//input command position
@@ -144,6 +154,17 @@ impl GUI {
             self.print(DrawText::new("x").with_pos(initial_position.x+i, initial_position.y));
         }
     }
+
+   pub fn get_player_name_from_input(&mut self) -> String{
+        cursor().goto(self.size.x/2, self.size.y-5);
+        let mut input_string_buffer = String::new();
+ 
+        io::stdin().read_line(&mut input_string_buffer);
+        let string_copy = input_string_buffer.clone();
+        self.state = GUIState::None;
+ 
+        string_copy
+     }
     pub fn draw_weapons_list(& self, _game : &GameState){
              let _cursor = cursor();
              self.print(DrawText::new("Weapons").with_color(Color::Green).with_pos(30, 5));
@@ -203,11 +224,11 @@ impl GUI {
         println!("{}", style(format!("Damage: {}", damage_per_hit))
                     .with(Color::Blue));
         //Draw health
-        _cursor.goto(self.size.x - 3, 0);
+        _cursor.goto(self.size.x - 4, 0);
         println!("{}", style(format!("{}%", player_health)) //player health
                     .with(Color::White));
 
-        _cursor.goto(self.size.x - 7, 0);
+        _cursor.goto(self.size.x - 8, 0);
         println!("{}", style(format!("<3: ")) //heart icon
                     .with(Color::Red));
 
@@ -267,6 +288,7 @@ impl GUI {
     fn center(&self) -> Point {
         self.size / 2
     }
+
 }
 
 /* -=[ goblins ]=-  6/97

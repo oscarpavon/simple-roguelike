@@ -18,7 +18,6 @@ use crossterm::input;
 
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
-use crate::input::*;
 
 use crate::features::Feature;
 use crate::game_state::{GameState, PLAYER_ID};
@@ -30,7 +29,7 @@ use crate::point::Point;
 
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
 const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
-const GUI_DISABLED_MODE : u8 = 3; //run the game in legacy mode
+
 
 fn main() {
 	println!("Starting game..");
@@ -83,74 +82,46 @@ fn start_game(mode : u8){
 
 	let mut _gui = GUI {
 		size: Point::new(_width, _height),
-		state: GUIState::None,
+		state: GUIState::MainMenu,
 		float_menu: new_float_menu,
 		cursor: Point::empty(),
 	};
 
 	let _input = input();
 
-
-	//TODO: read input, log, event from the other terminal
-	if mode == GUI_DEBUG_MODE {
-		_gui.create(); 										//open the new terminal a execute the game without argument
-		loop {
-
-			match _input.read_line() {//this is for pause purpose
-				Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
-				Err(e) => println!("error: {}", e),
-			}
+	match mode {
+		GUI_NORMAL_MODE => {
+			main_game_loop(&mut state, &mut _gui);
 		}
-	} else {
-		_gui.clear();
-		_gui.draw_main_menu();
-
-		//main game loop
-		loop {
-			let (_width, _height) = _terminal.terminal_size();//update console size
-			_gui.size = Point::new(_width, _height);
-
-			input_control(&mut state, &mut _gui);
-			_gui.clear();
-			//input_command(&state, _input_command, &_gui);
-			_gui.draw(&state, DrawText::new("test"));
+		GUI_DEBUG_MODE => {//game exected with -d argument
+			terminal_debug_loop(&mut _gui);
 		}
+		_ => println!("{}", "ERROR: No game mode available")
 	}
-
+	
 
 }
 
-fn get_game_start_mode_number() -> u8{
-	let args : Vec<_> = env::args().collect(); //read input argument
-
-	let mut imput_argument = String::from("");
-	if args.len() > 1 {
-		imput_argument = args[1].to_owned();
+fn main_game_loop(state : &mut GameState, _gui : &mut GUI){
+	_gui.clear();
+	//main game loop
+	loop {
+		let (_width, _height) = terminal().terminal_size();//update console size
+		_gui.size = Point::new(_width, _height);
+		_gui.draw(state, DrawText::new("test"));//first time draw main menu and get input name
+		_gui.draw(state, DrawText::new("test"));//draw the game interface and pause
+		input_control(state, _gui);
+		
+		//input_command(&state, _input_command, &_gui);
+		_gui.draw(state, DrawText::new("test"));//draw game interface with update data
+		
 	}
-
-	let _debug_open_new_console_string_argument = String::from("-d");
-	let _debug_game_console_gui_disabled_string_argument = String::from("-c");
-
-	let mut mode_number = 0;
-	match imput_argument {
-		_debug_game_console_gui_disabled_string_argument => {
-			mode_number = GUI_DISABLED_MODE
-			
-		}
-		_debug_open_new_console_string_argument => {
-			mode_number = GUI_DEBUG_MODE;
-		}
-		_ => mode_number = GUI_NORMAL_MODE
-
-	}
-
-	mode_number
 }
 
 fn create_creatures_structs() -> Vec<Creature> {
 	let human_warrior = Creature {
 		name: String::from("Thanos"),
-		health: 25,
+		health: 100,
 		damage: 4,
 		features: vec![]
 	};
@@ -349,6 +320,37 @@ fn input_command(state: &mut GameState, _input_command : Command){
 
 
 
+}
+
+fn terminal_debug_loop(_gui : &mut GUI) {
+	_gui.create_in_new_terminal(); 										//open the new terminal and execute the game without argument
+	loop {
+		//TODO: read input, log, event from the other terminal
+		match input().read_line() {//this is for pause purpose
+			Ok(input_command_text) => println!("string typed: {}", input_command_text), // TODO: compare with Command Struct stuff
+			Err(e) => println!("error: {}", e),
+		}
+	}
+}
+
+fn get_game_start_mode_number() -> u8{
+	let args : Vec<_> = env::args().collect(); //read input argument
+
+	let mut input_argument = String::from("");
+	if args.len() > 1 {
+		input_argument = args[1].to_owned();
+	}
+
+	let _debug_open_new_console_string_argument = String::from("-d");	
+
+	let mut mode_number = 0;
+	if input_argument == _debug_open_new_console_string_argument {
+		mode_number = GUI_DEBUG_MODE;
+	}else{
+		mode_number = GUI_NORMAL_MODE;
+	}
+	
+	mode_number
 }
 fn save_file() -> std::io::Result<()>{
 	let mut file = File::create("./src/save_data.txt")?;
