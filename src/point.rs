@@ -40,6 +40,6 @@ impl Div<u16> for Point {
     type Output = Self;
 
     fn div(self, div: u16) -> Self {
-        Point::new(self.x / 16, self.y / 16)
+        Point::new(self.x / 2, self.y / 2)
     }
 }
