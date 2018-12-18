@@ -2,7 +2,6 @@ use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
 use std::process::Command;
 use crossterm::terminal::*;
-use std::str::FromStr;
 use std::io;
 
 use crate::GameState;
@@ -56,7 +55,7 @@ impl DrawText {
 }
 
 impl GUI {
-    pub fn create(&self) -> bool {
+    pub fn create_in_new_terminal(&self) -> bool {
         if cfg!(target_os = "windows"){
             Command::new("cmd")
                 .arg("/k")

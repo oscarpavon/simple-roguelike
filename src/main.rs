@@ -34,24 +34,24 @@ const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
 fn main() {
 	println!("Starting game..");
 
-	match get_game_start_mode_number() {
-		GUI_DEBUG_MODE => {
-			println!("Starting in DEBUG mode");
-			start_game(GUI_DEBUG_MODE);
-		}
-		GUI_DISABLED_MODE => {
-			println!("Starting in game command mode");
-			start_game(GUI_DISABLED_MODE);
-		}
-		_ => {
-			println!("Starting in NORMAL mode");
-			start_game(GUI_NORMAL_MODE);
-		}
-	}
+	start_game();
 
 }
 
-fn start_game(mode : u8){
+fn start_game () {
+	match get_game_start_mode_number() {
+			GUI_DEBUG_MODE => {
+				println!("Starting in DEBUG mode");
+				init_data_go_in_loop_game(GUI_DEBUG_MODE);
+			}
+			_ => {
+				println!("Starting in NORMAL mode");
+				init_data_go_in_loop_game(GUI_NORMAL_MODE);
+			}
+		}
+}
+//
+fn init_data_go_in_loop_game(mode : u8){
 
 	let _terminal = terminal();
 
@@ -87,8 +87,7 @@ fn start_game(mode : u8){
 		cursor: Point::empty(),
 	};
 
-	let _input = input();
-
+	
 	match mode {
 		GUI_NORMAL_MODE => {
 			main_game_loop(&mut state, &mut _gui);
@@ -131,10 +130,18 @@ fn create_creatures_structs() -> Vec<Creature> {
 		damage: 2,
 		features: vec![Feature::Aggression]
 	};
+	let brown_goblin = Creature {
+		name: String::from("brown_goblin"),
+		health: 12,
+		damage: 2,
+		features: vec![Feature::Aggression]
+	};
 
 	let mut created_creatures = Vec::new();
 	created_creatures.push(human_warrior);
 	created_creatures.push(goblin);
+	created_creatures.push(brown_goblin);
+	
 
 	created_creatures
 }
