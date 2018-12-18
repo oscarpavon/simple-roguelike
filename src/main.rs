@@ -7,6 +7,11 @@ mod weapons;
 
 use std::env; //for input argument
 
+//Files
+use std::fs::File;
+use std::io::prelude::*;
+
+
 extern crate crossterm;
 use crossterm::terminal::*;
 use crossterm::input;
@@ -221,6 +226,12 @@ status: Show your character's status and remaining enemies."
 				process::exit(0x0100); //on linux but 0x0256 on Windows :TODO
 
 			}
+			Command::Save => {
+				create_file(String::from("here the name player"));
+			}
+			Command::OpenFile => {
+
+			}
 			_ => {
 				//
 			}
@@ -357,4 +368,15 @@ fn input_control(state : &GameState , gui : &mut GUI) {
 			},
 		Err(e) => println!("char error : {}", e),
 	}
+		
+	
 }
+
+fn create_file(text_to_save : String) -> std::io::Result<()> {
+
+		let mut file = File::create("./src/data/save_data")?;
+    	file.write_all(b"data from game")?;
+    	Ok(())
+		
+}
+

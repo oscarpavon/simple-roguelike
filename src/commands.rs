@@ -22,7 +22,9 @@ pub enum Command {
     Help,
     Debug(DebugCommand),
     Dummy,
-    Exit
+    Exit,
+    Save,
+    OpenFile
 
 }
 pub enum DebugCommand {
@@ -95,6 +97,13 @@ impl Command {
                         println!("{}", style("Debug mode is disabled.")
                                    .with(Color::DarkRed))
                     }
+                }
+                "save" => {
+                    return Command::Save;
+                }
+
+                "openfile" => {
+                    return Command::OpenFile;
                 }
                 _ => {
                     println!("{}",
