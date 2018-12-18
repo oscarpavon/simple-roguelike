@@ -11,6 +11,7 @@ use crate::point::Point;
 pub enum GUIState {
     HelpScreen,
     MessageBox,
+    MainMenu,
     None
 }
 pub struct GUI {
@@ -58,7 +59,7 @@ impl GUI {
         if cfg!(target_os = "windows"){
             Command::new("cmd")
                 .arg("/k")
-                .arg("./target/debug/simple-roguelike")
+                .arg("./target/debug/simple-roguelike.exe")
                 .output()
                 .expect("failed to open cmd");
         }
@@ -72,7 +73,32 @@ impl GUI {
         true
     }
     pub fn draw(&self, _game: &GameState, text: DrawText){
-        let _cursor = cursor();
+        
+
+        self.draw_game_interface(_game,text);
+        match self.state {
+            GUIState::HelpScreen => {
+                self.clear();
+                self.draw_help_screen()
+                }
+                
+            GUIState::MessageBox => {
+                self.clear();
+                self.draw_message_box()
+            }
+            GUIState::MainMenu => {
+                self.clear();
+                self.draw_main_menu();
+            }
+            GUIState::None => ()
+        }
+        //self.clear();
+
+       cursor().goto(0, self.size.y);//input command position
+       cursor().goto(self.cursor.x, self.cursor.y);//input command position
+    }
+     fn draw_game_interface(&self, _game : &GameState, text: DrawText){
+         let _cursor = cursor();
         self.draw_status_bar(_game);
         self.draw_enemies_names(_game);
         self.draw_weapons_list(_game);
@@ -84,26 +110,7 @@ impl GUI {
         self.draw_float_menu(&self.float_menu);
         self.print(DrawText::new("Press '1' key to see help")
                 .with_color(Color::Green).with_pos(1, self.size.y - 4));
-
-        
-        match self.state {
-            GUIState::HelpScreen => {
-                self.clear();
-                self.draw_help_screen()
-                }
-                
-            GUIState::MessageBox => {
-                self.clear();
-                self.draw_message_box()
-            }
-            
-            GUIState::None => ()
-        }
-        //self.clear();
-
-       _cursor.goto(0, self.size.y);//input command position
-       _cursor.goto(self.cursor.x, self.cursor.y);//input command position
-    }
+     }
 
     //print text only where no have GUI (min: 1 , max = height - 3 )
     //TODO: where not draw condition
@@ -114,35 +121,29 @@ impl GUI {
     }
 
     pub fn draw_main_menu(&self){
-        for x in 0..self.size.x {
-             self.print(DrawText::new("x").with_color(Color::Green).with_pos(x, 1));
-        }
-
+        
         self.print(DrawText::new("Simple Rusty Roguelike").with_color(Color::Green)
-                .with_pos(self.center().x, 4));
+                .with_pos(self.center().x-10, 4));
 
-        println!("{}", style("\n## You're the only human warrior left\n")
-                    .with(Color::Green));
-        println!("{}", style("\n and must defeat all enemies!\n")
-                    .with(Color::Green));
+       // You're the only human warrior left and must defeat all enemies!
+        
 
-        self.print(DrawText::new("--> New Game <--").with_color(Color::Green)
-                .with_pos(self.center().x - 6, self.size.y - 8));
-        self.print(DrawText::new("Exit").with_color(Color::Green)
-                .with_pos(self.center().x - 3, self.size.y - 7));
-
-        for i in 0..self.size.x {
-            self.print(DrawText::new("x").with_color(Color::Green)
-                    .with_pos(i, self.size.y - 3));
-        }
-        for i in 1..self.size.y - 3 {
-             self.print(DrawText::new("x").with_color(Color::Green)
-                    .with_pos(0, i));
-             self.print(DrawText::new("x").with_color(Color::Green)
-                    .with_pos(self.size.x, i));
-        }
+        self.draw_line(self.size.x, Point::new(0, 1));
+       //self.draw_line(self.size.x, Point::new(0, 20));
+       
+        self.print(DrawText::new("nickname: ")
+        .with_color(Color::Grey)       
+        .with_pos(20,self.size.y - 5));
+        cursor().goto(30, self.size.y - 5);
+        
     }
 
+    //horizontal line :TODO vertical 
+    fn draw_line(&self, lengh : u16, initial_position : Point){
+        for i in 0..lengh {
+            self.print(DrawText::new("x").with_pos(initial_position.x+i, initial_position.y));
+        }
+    }
     pub fn draw_weapons_list(& self, _game : &GameState){
              let _cursor = cursor();
              self.print(DrawText::new("Weapons").with_color(Color::Green).with_pos(30, 5));
@@ -166,7 +167,7 @@ impl GUI {
         self.print(DrawText::new("Health").with_color(Color::Green).with_pos(20, 5));
 
         let _player = _game.creatures.get(1)
-                .expect("Game logic error: the player is dead and the game is still running.");
+                .expect("The creature is dead and not exist");
 
         //Stats
         let player_health = _player.health;
@@ -223,6 +224,15 @@ impl GUI {
                 .with_pos(1, self.center().y - 2));
         self.print(DrawText::new("- Press 'a' to atack selected enemy").with_color(Color::Green)
                 .with_pos(1, self.center().y - 1));
+        self.print(DrawText::new("- Press ':' and the write a command").with_color(Color::Green)
+                .with_pos(1, self.center().y - 1));
+
+       
+        self.print(DrawText::new("The available commands are:
+        attack: Hit enemies. Usage: 'attack enemy_name'
+        examine: Shows the status of a creature. Usage: 'examine enemy_name'
+        status: Show your character's status and remaining enemies.").with_color(Color::Green)
+                .with_pos(1, self.center().y + 3));
     }
 
     pub fn draw_message_box(&self) {

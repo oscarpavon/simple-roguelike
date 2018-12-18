@@ -21,9 +21,10 @@ pub fn aggressive_system(state: &mut GameState) {
 pub fn player_system(state: &mut GameState) {
 	// Can unwrap here because the player should exist.
 	// If not then why should the game even be running.
-	let player_health = state.creatures.get(PLAYER_ID)
-									   .expect("Game logic error: the player is dead and the game is still running.")
-									   .health;
+	
+	//let player_health = state.creatures.get(PLAYER_ID)
+	//								   .expect("Game logic error: the player is dead and the game is still running.")
+	//								   .health;
 	
 	
 	// Player control consists of three phases:

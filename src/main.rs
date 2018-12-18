@@ -7,6 +7,10 @@ mod weapons;
 mod point;
 
 use std::env; //for input argument
+use std::process;
+use std::io;
+use std::fs::File;
+use std::io::prelude::*;
 
 extern crate crossterm;
 use crossterm::terminal::*;
@@ -15,7 +19,6 @@ use crossterm::input;
 use crate::crossterm::cursor::*;
 use crossterm::style::{Color, style};
 use crate::input::*;
-use std::process;
 
 use crate::features::Feature;
 use crate::game_state::{GameState, PLAYER_ID};
@@ -87,6 +90,7 @@ fn start_game(mode : u8){
 
 	let _input = input();
 
+
 	//TODO: read input, log, event from the other terminal
 	if mode == GUI_DEBUG_MODE {
 		_gui.create(); 										//open the new terminal a execute the game without argument
@@ -106,7 +110,7 @@ fn start_game(mode : u8){
 			let (_width, _height) = _terminal.terminal_size();//update console size
 			_gui.size = Point::new(_width, _height);
 
-			input_control(&mut _gui);
+			input_control(&mut state, &mut _gui);
 			_gui.clear();
 			//input_command(&state, _input_command, &_gui);
 			_gui.draw(&state, DrawText::new("test"));
@@ -131,6 +135,7 @@ fn get_game_start_mode_number() -> u8{
 	match imput_argument {
 		_debug_game_console_gui_disabled_string_argument => {
 			mode_number = GUI_DISABLED_MODE
+			
 		}
 		_debug_open_new_console_string_argument => {
 			mode_number = GUI_DEBUG_MODE;
@@ -163,44 +168,6 @@ fn create_creatures_structs() -> Vec<Creature> {
 	created_creatures
 }
 
-fn input_command(state: &GameState, _input_command : Command, gui : &GUI){
-
-	match _input_command {
-			Command::Attack(target) => {
-				//state.hit(PLAYER_ID, target);
-			}
-			Command::Examine(target) => {
-				let creature = state.creatures.get(target)
-											  .expect("Game logic error: if the player is choosing this creature then it must exist.");
-				let stylized = style(format!("{} has {} hitpoints remaining and does {} damage.",
-				creature.name, creature.health, creature.damage)).with(Color::Red);
-				println!("{}", stylized);
-			}
-			Command::Status => {
-
-				//let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
-				//println!("{}", stylized);
-				gui.print(DrawText::new("status").with_color(Color::DarkBlue).with_pos(5, 5));
-				//gui.text = String::from("test");
-			}
-			Command::Help => {
-				println!("The available commands are:
-attack: Hit enemies. Usage: 'attack enemy_name'
-examine: Shows the status of a creature. Usage: 'examine enemy_name'
-status: Show your character's status and remaining enemies."
-				);
-			}
-			Command::Debug(DebugCommand::Remove(target)) => {
-				//let creature: Creature = state.creatures.remove(target);
-				//println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
-			}
-			_ => {
-				//
-			}
-		}
-
-
-}
 
 fn create_weapons(_state : &mut GameState){
 	let big_sword = Weapon {
@@ -224,7 +191,7 @@ fn create_weapons(_state : &mut GameState){
 	_state.weapon_manager.add_weapon(snife.clone());
 }
 
-fn input_control(gui : &mut GUI) {
+fn input_control(state : &mut GameState , gui : &mut GUI) {
 	let _cursor = cursor();
 
 	match input().read_char() {
@@ -237,7 +204,10 @@ fn input_control(gui : &mut GUI) {
 							gui.float_menu.selected_item -= 1;
 
 					} else {
-						gui.cursor.y -= 1
+						if gui.cursor.y > 0{
+							gui.cursor.y -= 1		//implement in GUI   		gui.cursor_move_down()
+						}
+						
 					}
 
 				}
@@ -245,11 +215,18 @@ fn input_control(gui : &mut GUI) {
 					if gui.float_menu.active == true {
 						gui.float_menu.selected_item += 1;
 					}else{
-						gui.cursor.y += 1
+
+						if gui.cursor.y < gui.size.y {
+							gui.cursor.y += 1
+						}						
 					}
 
 				}
-				'h' => gui.cursor.x -= 1,
+				'h' => {
+					if gui.cursor.x > 0 {
+						gui.cursor.x -= 1
+					}					
+				}
 				'l' => gui.cursor.x += 1,
 				'e' => {//enemies select position
 					gui.cursor.x = 12;
@@ -298,9 +275,93 @@ fn input_control(gui : &mut GUI) {
 						_ => ()
 					}
 				}
+				'm' => {//main menu
+					//back to the game with the same game
+					gui.state = if gui.state != GUIState::MainMenu {
+						GUIState::MainMenu
+					} else {
+						GUIState::None
+					};
+				}
+				':' => {//command mode
+ 
+  						cursor().goto(0, gui.size.y);
+ 						print!("{}",':');
+ 						cursor().goto(1, gui.size.y);
+ 						let mut input_string_buffer = String::new();
+ 
+  						io::stdin().read_line(&mut input_string_buffer);
+						let command = Command::get(state, input_string_buffer);
+ 						input_command(state, command);
+				}
 				_ => {}
 			}
 		}
 		Err(e) => println!("char error : {}", e)
 	}
 }
+
+fn input_command(state: &mut GameState, _input_command : Command){
+
+	match _input_command {
+			Command::Attack(target) => {
+				state.hit(PLAYER_ID, target);
+			}
+			Command::Examine(target) => {
+				let creature = state.creatures.get(target)
+											  .expect("Game logic error: if the player is choosing this creature then it must exist.");
+				let stylized = style(format!("{} has {} hitpoints remaining and does {} damage.",
+				creature.name, creature.health, creature.damage)).with(Color::Red);
+				println!("{}", stylized);
+			}
+			Command::Status => {
+
+				//let stylized = style(format!("== There are {} enemies: {}", count.to_string(), creature_string)).with(Color::Red);
+				//println!("{}", stylized);
+				
+				//gui.text = String::from("test");
+
+			}
+			Command::Help => {
+				//show gui help
+				
+			}
+			Command::Debug(DebugCommand::Remove(target)) => {
+				state.creatures.remove(target);
+				//println!("Creature '{}' with the id {} has been removed from the game.", creature.name, target);
+			}
+			Command::Exit => {
+ 				
+				process::exit(0x0100); //on linux but 0x0256 on Windows :TODO
+ 
+  			}
+			Command::OpenFile => {
+				open_file();
+			}
+			Command::Save => {
+				//save name in file
+				save_file();
+			}
+			_ => {
+				//
+			}
+		}
+
+
+
+}
+fn save_file() -> std::io::Result<()>{
+	let mut file = File::create("./src/save_data.txt")?;
+  	 file.write_all(b"player name here")?;
+   	Ok(())
+}
+	
+fn open_file() -> std::io::Result<()> {
+    let mut file = File::open("./src/save_data.txt")?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    //assert_eq!(contents, "Hello, world!");
+    Ok(())
+}
+
+/* 			println!( */

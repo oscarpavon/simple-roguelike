@@ -1,19 +1,9 @@
-use std::io;
-use std::io::prelude::*;
 use crossterm::style::{Color, style};
 
 use crate::game_state::{GameState, PLAYER_ID};
 use crate::creatures::CreatureId;
 
-pub fn pause() {
-    // Read a single byte and discard
-    let _ = io::stdin().read(&mut [1u8]).unwrap();
-    let _ = io::stdin().read(&mut [1u8]).unwrap();
-}
-
 const DEBUG_MODE_ENABLED: bool = true;
-
-
 
 pub enum Command {
 	Attack(CreatureId),
@@ -67,10 +57,10 @@ impl Command {
                                    .with(Color::DarkRed))
 				}
 				"status" => {                   
-					Command::Status;                    
+					return Command::Status;                    
 				}
 				"help" => {
-    				Command::Help;
+    				return Command::Help;
 				}
                 "exit" => {
                     return Command::Exit;
