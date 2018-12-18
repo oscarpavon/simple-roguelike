@@ -72,6 +72,18 @@ fn init_data_go_in_loop_game(mode : u8){
 	items_menu.push(item_two);
 	items_menu.push(item_three);
 
+	let mut menus = Vec::new();
+	let creatures_names = state.get_alive_creatures_name();
+
+    let mut new_float_menu = FloatMenu::new(Point::new(0, 15))
+                            .with_array_items(creatures_names.clone());	
+
+    let mut other_menu = FloatMenu::new(Point::new(40, 8))
+                            .with_array_items(creatures_names.clone());
+
+	menus.push(new_float_menu);
+	menus.push(other_menu);
+	
 	create_weapons(&mut state);
 	let new_float_menu = FloatMenu{
 		active: false,
@@ -85,6 +97,7 @@ fn init_data_go_in_loop_game(mode : u8){
 		state: GUIState::MainMenu,
 		float_menu: new_float_menu,
 		cursor: Point::empty(),
+		menus_to_draw : menus
 	};
 
 	
@@ -269,8 +282,8 @@ fn input_control(state : &mut GameState , gui : &mut GUI) {
  						let mut input_string_buffer = String::new();
  
   						io::stdin().read_line(&mut input_string_buffer);
-						let command = Command::get(state, input_string_buffer);
- 						input_command(state, command);
+						let command = Command::get(state, input_string_buffer, gui);
+ 						input_command(state, command, gui);
 				}
 				_ => {}
 			}
@@ -279,11 +292,17 @@ fn input_control(state : &mut GameState , gui : &mut GUI) {
 	}
 }
 
-fn input_command(state: &mut GameState, _input_command : Command){
+fn input_command(state: &mut GameState, _input_command : Command, gui : &mut GUI){
 
 	match _input_command {
 			Command::Attack(target) => {
-				state.hit(PLAYER_ID, target);
+				//state.hit(PLAYER_ID, target);
+				let creatures_names = state.get_alive_creatures_name();
+
+				let mut new_float_menu = FloatMenu::new(Point::new(50, 2))
+									.with_array_items(creatures_names);      
+			
+				gui.menus_to_draw.push(new_float_menu);
 			}
 			Command::Examine(target) => {
 				let creature = state.creatures.get(target)

@@ -3,6 +3,10 @@ use crossterm::style::{Color, style};
 use crate::game_state::{GameState, PLAYER_ID};
 use crate::creatures::CreatureId;
 
+use crate::GUI;
+use crate::FloatMenu;
+use crate::Point;
+
 const DEBUG_MODE_ENABLED: bool = true;
 
 pub enum Command {
@@ -24,7 +28,7 @@ pub enum DebugCommand {
 
 impl Command {
    
-	pub fn get(state: &GameState, input_string_command : String) -> Command {
+	pub fn get(state: &GameState, input_string_command : String, gui : &mut GUI) -> Command {
 		
            
 			let parts: Vec<&str> = input_string_command.trim().split(' ').collect();
@@ -44,9 +48,12 @@ impl Command {
                                             .with(Color::DarkRed))
                             }
 						}
+                        
 					}
                     println!("{}", style("Please write a correct target: ex: 'attack goblin'.")
-                                   .with(Color::DarkRed))
+                                   .with(Color::DarkRed));
+
+                    return Command::Attack(1);
 				}
 				"examine" => {
 					if parts.len() > 1 {

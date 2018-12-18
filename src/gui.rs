@@ -18,7 +18,8 @@ pub struct GUI {
     pub size: Point,
     pub state: GUIState,
     pub float_menu: FloatMenu,
-    pub cursor: Point
+    pub cursor: Point,
+    pub menus_to_draw : Vec<FloatMenu>
 }
 pub struct FloatMenu {
     pub active: bool,
@@ -33,12 +34,12 @@ pub struct DrawText {
     color: Color,
 }
 impl FloatMenu {
-    pub fn new() -> FloatMenu {
+    pub fn new(position : Point) -> FloatMenu {
         FloatMenu {
             active: true,
             selected_item : 0,
             item_vec : Vec::new(),
-            position : Point::new(3,8)
+            position : position
         }
     }
     pub fn with_array_items(mut self, list : Vec<String>) -> FloatMenu{
@@ -68,7 +69,7 @@ impl DrawText {
     }
 }
 
-impl GUI {
+impl GUI {    
     pub fn create_in_new_terminal(&self) -> bool {
         if cfg!(target_os = "windows"){
             Command::new("cmd")
@@ -127,10 +128,16 @@ impl GUI {
         println!("{}", text.text);
 
         self.draw_float_menu(&self.float_menu);
+        self.draw_menus();
         self.print(DrawText::new("Press '1' key to see help")
                 .with_color(Color::Green).with_pos(1, self.size.y - 4));
      }
 
+    fn draw_menus(&self){
+        for i in 0..self.menus_to_draw.len(){
+            self.draw_float_menu(&self.menus_to_draw[i]);
+        }
+    }
     //print text only where no have GUI (min: 1 , max = height - 3 )
     //TODO: where not draw condition
     pub fn print(&self, text: DrawText) {
@@ -198,19 +205,12 @@ impl GUI {
     pub fn draw_enemies_names(& self, _game : &GameState){
         self.print(DrawText::new("Health").with_color(Color::Green).with_pos(20, 5));
 
-       // let _creature = _game.creatures.get(1)
-         //       .expect("The creature is dead and not exist");
-        
         let creatures_names = _game.get_alive_creatures_name();
 
-        let mut new_float_menu = FloatMenu::new()
-                            .with_array_items(creatures_names);
-
-        //Stats
-        //let player_health = _creature.health;
-        let player_health = 2;
-       // let player_name = &_creature.name; //string variables need be reference
-       self.draw_float_menu(&new_float_menu);
+        let mut new_float_menu = FloatMenu::new(Point::new(0, 8))
+                            .with_array_items(creatures_names);      
+       
+        self.draw_float_menu(&new_float_menu);
     }
 
     fn draw_status_bar(& self, _game : &GameState){
