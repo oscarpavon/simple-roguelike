@@ -85,12 +85,21 @@ impl GUI {
         self.print(DrawText::new("Press '1' key to see help")
                 .with_color(Color::Green).with_pos(1, self.size.y - 4));
 
-        self.clear();
+        
         match self.state {
-            GUIState::HelpScreen => self.draw_help_screen(),
-            GUIState::MessageBox => self.draw_message_box(),
+            GUIState::HelpScreen => {
+                self.clear();
+                self.draw_help_screen()
+                }
+                
+            GUIState::MessageBox => {
+                self.clear();
+                self.draw_message_box()
+            }
+            
             GUIState::None => ()
         }
+        //self.clear();
 
        _cursor.goto(0, self.size.y);//input command position
        _cursor.goto(self.cursor.x, self.cursor.y);//input command position
