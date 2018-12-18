@@ -21,7 +21,10 @@ pub enum Command {
 	Status,
     Help,
     Debug(DebugCommand),
-    Dummy
+    Dummy,
+    Exit,
+    Save,
+    OpenFile
 
 }
 pub enum DebugCommand {
@@ -30,15 +33,10 @@ pub enum DebugCommand {
 
 impl Command {
    
-	pub fn get(state: &GameState) -> Command {
-		let stdin = io::stdin();
-		let mut input_string_buffer = String::new();
-
-	
-            stdin.read_line(&mut input_string_buffer).unwrap();
-
-
-			let parts: Vec<&str> = input_string_buffer.trim().split(' ').collect();
+	pub fn get(state: &GameState, input_string_command : String) -> Command {
+		
+           
+			let parts: Vec<&str> = input_string_command.trim().split(' ').collect();
 
             // The repetition of parts.len() > 1 is acknowledged but is necessary due to one-worded
             // commands, such as 'status' or 'help'
@@ -74,6 +72,9 @@ impl Command {
 				"help" => {
     				Command::Help;
 				}
+                "exit" => {
+                    return Command::Exit;
+                }
                 "debug" => {
                     if DEBUG_MODE_ENABLED {
                         if parts.len() > 1 {
@@ -97,6 +98,13 @@ impl Command {
                                    .with(Color::DarkRed))
                     }
                 }
+                "save" => {
+                    return Command::Save;
+                }
+
+                "openfile" => {
+                    return Command::OpenFile;
+                }
                 _ => {
                     println!("{}",
                               style(format!("'{}' is not a correct command.", parts[0]))
@@ -105,7 +113,7 @@ impl Command {
                 }
 			}
 
-			input_string_buffer.clear();
+			//input_string_command.clear(); //clean when out of the scope ? read the manual =)
             Command::Dummy //for test
 		
 	}
