@@ -30,9 +30,6 @@ use crate::point::Point;
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
 const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
 
-pub struct Input {
-	pub mode : u8 // mode 1 = read key ; mode 2 = read line
-}
 fn main() {
 	println!("Starting game..");
 
@@ -80,28 +77,36 @@ fn init_data_go_in_loop_game(mode : u8){
     let mut new_float_menu = FloatMenu::new(Point::new(0, 15))
                             .with_array_items(creatures_names.clone());	
 
-    let mut other_menu = FloatMenu::new(Point::new(40, 8))
-                            .with_array_items(creatures_names.clone());
+	
 
-	menus.push(new_float_menu);
-	menus.push(other_menu);
 	
 	create_weapons(&mut state);
-	let new_float_menu = FloatMenu{
-		active: false,
+	let attack_float_menu = FloatMenu{
+		focus : true,
+		visible: false,
 		selected_item: 0,
-		item_vec: items_menu,
+		item_vec: items_menu.clone(),
 		position: Point::new(45,8),
 	};
 
+	let other_menu = FloatMenu{
+		focus : false,
+		visible: false,
+		selected_item: 0,
+		item_vec: items_menu,
+		position: Point::new(0,8),
+	};
+
+	menus.push(attack_float_menu);
 	let mut _gui = GUI {
 		size: Point::new(_width, _height),
 		state: GUIState::MainMenu,
-		float_menu: new_float_menu,
+		float_menu: other_menu,
 		cursor: Point::empty(),
-		menus_to_draw : menus
+		menus_to_draw : menus		
 	};
 
+	
 	
 	match mode {
 		GUI_NORMAL_MODE => {
@@ -189,29 +194,16 @@ fn input_control(state : &mut GameState , gui : &mut GUI) {
 
 	match input().read_char() {
 		Ok(s) => {
+			state.input.key = s; //assing input to game state
 			match s {
-				'k' => {
-					if gui.float_menu.active == true {
-						//if gui.float_menu.selected_item == gui.float_menu.items_string_to_draw.len() as u8{
-
-							gui.float_menu.selected_item -= 1;
-
-					} else {
-						if gui.cursor.y > 0{
-							gui.cursor.y -= 1		//implement in GUI   		gui.cursor_move_down()
-						}
-						
-					}
-
+				'k' => {					
+					if gui.cursor.y > 0{
+						gui.cursor.y -= 1		//implement in GUI   		gui.cursor_move_down()
+					}				
 				}
 				'j' => {
-					if gui.float_menu.active == true {
-						gui.float_menu.selected_item += 1;
-					}else{
-
-						if gui.cursor.y < gui.size.y {
-							gui.cursor.y += 1
-						}						
+					if gui.cursor.y < gui.size.y {
+					gui.cursor.y += 1
 					}
 
 				}
@@ -232,12 +224,14 @@ fn input_control(state : &mut GameState , gui : &mut GUI) {
 				's' => {//select
 					gui.cursor.x = 12;
 					gui.cursor.y = 6;
-					gui.float_menu.active = if gui.float_menu.active == false {
+					/* gui.float_menu.visible = if gui.float_menu.visible == false {
+						gui.float_menu.focus = true;
 						true
 					} else {
+						gui.float_menu.focus = false;
 						false
-					}
-
+					} */
+					gui.menus_to_draw[0].visible = true;
 				}
 				'1' => {
 					gui.state = if gui.state != GUIState::HelpScreen {

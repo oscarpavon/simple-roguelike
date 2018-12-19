@@ -4,8 +4,6 @@ use crate::game_state::{GameState, PLAYER_ID};
 use crate::creatures::CreatureId;
 
 use crate::GUI;
-use crate::FloatMenu;
-use crate::Point;
 
 const DEBUG_MODE_ENABLED: bool = true;
 

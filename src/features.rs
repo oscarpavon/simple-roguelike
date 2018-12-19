@@ -1,8 +1,4 @@
-use crossterm::style::{Color, style};
-
 use crate::game_state::{GameState, PLAYER_ID};
-use crate::creatures::Creature;
-use crate::commands::*;
 
 
 #[derive(Clone, PartialEq, Eq)]

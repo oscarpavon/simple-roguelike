@@ -4,18 +4,20 @@ use crate::creatures::*;
 use crate::features::{Feature, aggressive_system, player_system};
 
 use crate::weapons::*;
-use crate::GUI;
 
 pub const PLAYER_ID: CreatureId = 0;
 
-pub struct Input {
-	pub mode : u8 // mode 1 = read key ; mode 2 = read line
+#[derive(Clone)]
+pub struct GameInput {
+	pub mode : u8,// mode 1 = read key ; mode 2 = read line
+	pub key : char
 }
 
 pub struct GameState {
 	pub creatures: CreatureMap,
 	pub aggressive: Vec<CreatureId>,
 	pub weapon_manager : WeaponManager,
+	pub input : GameInput
 	
 }
 
@@ -37,10 +39,15 @@ impl AttackDirection {
 
 impl GameState {
 	pub fn new(player: Creature) -> GameState {
+		let new_input_data= GameInput {
+			mode : 0,
+			key : ':'
+		};
 		let mut state = GameState {
 			creatures: CreatureMap::new(),
 			aggressive: Vec::new(),
 			weapon_manager: WeaponManager::new(),
+			input : new_input_data
 			
 		};
 		state.creatures.add(player);

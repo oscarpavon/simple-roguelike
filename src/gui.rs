@@ -4,8 +4,9 @@ use std::process::Command;
 use crossterm::terminal::*;
 use std::io;
 
-use crate::GameState;
+use crate::game_state::GameInput;
 use crate::point::Point;
+use crate::game_state::GameState;
 
 
 #[derive(PartialEq)]
@@ -21,10 +22,11 @@ pub struct GUI {
     pub state: GUIState,
     pub float_menu: FloatMenu,
     pub cursor: Point,
-    pub menus_to_draw : Vec<FloatMenu>
+    pub menus_to_draw : Vec<FloatMenu>        
 }
 pub struct FloatMenu {
-    pub active: bool,
+    pub focus: bool,//only is focus read input
+    pub visible: bool,
     pub selected_item: usize,
     pub item_vec: Vec<String>,
     pub position: Point
@@ -38,7 +40,8 @@ pub struct DrawText {
 impl FloatMenu {
     pub fn new(position : Point) -> FloatMenu {
         FloatMenu {
-            active: true,
+            focus : false,
+            visible: true,
             selected_item : 0,
             item_vec : Vec::new(),
             position : position
@@ -47,6 +50,22 @@ impl FloatMenu {
     pub fn with_array_items(mut self, list : Vec<String>) -> FloatMenu{
         self.item_vec = list;
         self
+    }
+    pub fn update(&mut self, state : &GameState){
+        if state.input.key == 'j' {
+            self.focus_move_down();
+        }
+        if state.input.key == 'k' {
+            self.focus_move_up();
+        }
+    }
+    fn focus_move_down(&mut self){
+        self.selected_item += 1;
+    }
+    fn focus_move_up(&mut self){        
+        if self.selected_item > 1 {
+            self.selected_item -= 1;
+        }
     }
 }
 impl DrawText {
@@ -137,7 +156,7 @@ impl GUI {
 
         }
     }
-     fn draw_game_interface(&self, _game : &GameState, text: DrawText){
+     fn draw_game_interface(&mut self, _game : &GameState, text: DrawText){
          let _cursor = cursor();
         self.draw_status_bar(_game);
         self.draw_enemies_names(_game);
@@ -148,16 +167,18 @@ impl GUI {
         println!("{}", text.text);
 
         self.draw_float_menu(&self.float_menu);
-        self.draw_menus();
+        self.draw_menus(_game);
         self.print(DrawText::new("Press '1' key to see help")
                 .with_color(Color::Green).with_pos(1, self.size.y - 4));
      }
 
-    fn draw_menus(&self){
+    fn draw_menus(&mut self, state : &GameState){
         for i in 0..self.menus_to_draw.len(){
+            self.menus_to_draw[i].update(state);
             self.draw_float_menu(&self.menus_to_draw[i]);
         }
     }
+
     //print text only where no have GUI (min: 1 , max = height - 3 )
     //TODO: where not draw condition
     pub fn print(&self, text: DrawText) {
@@ -227,10 +248,10 @@ impl GUI {
 
         let creatures_names = _game.get_alive_creatures_name();
 
-        let mut new_float_menu = FloatMenu::new(Point::new(0, 8))
-                            .with_array_items(creatures_names);      
+       // let mut new_float_menu = FloatMenu::new(Point::new(0, 8))
+         //                   .with_array_items(creatures_names);      
        
-        self.draw_float_menu(&new_float_menu);
+        //self.draw_float_menu(&new_float_menu);
     }
 
     fn draw_status_bar(& self, _game : &GameState){
@@ -296,7 +317,11 @@ impl GUI {
     }
 
     pub fn draw_float_menu(&self, menu: &FloatMenu){
-        if menu.active {
+        if menu.visible {
+            if menu.focus {
+                self.print(DrawText::new("*")
+                .with_pos(menu.position.x-1, menu.position.y));
+            }
             for i in 0..menu.item_vec.len(){
                 let text = &menu.item_vec[i];
 
@@ -308,7 +333,7 @@ impl GUI {
 
                 self.print(DrawText::new(text).with_color(color)
                         .with_pos(menu.position.x, menu.position.y + {i as u16}));
-            }
+            }            
         }
     }
     pub fn clear(&self){
