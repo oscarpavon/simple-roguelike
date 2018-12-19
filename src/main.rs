@@ -127,8 +127,8 @@ fn main_game_loop(state : &mut GameState, _gui : &mut GUI){
 	loop {
 		let (_width, _height) = terminal().terminal_size();//update console size
 		_gui.size = Point::new(_width, _height);
-		_gui.draw(state, DrawText::new("test"));//first time draw main menu and get input name
-		_gui.draw(state, DrawText::new("test"));//draw the game interface and pause
+		//_gui.draw(state, DrawText::new("test"));//first time draw main menu and get input name
+		//_gui.draw(state, DrawText::new("test"));//draw the game interface and pause
 		input_control(state, _gui);
 		
 		//input_command(&state, _input_command, &_gui);

@@ -54,18 +54,18 @@ impl FloatMenu {
     }
     pub fn update(&mut self, state : &mut GameState){
         if state.input.key == 'j' {
-            self.focus_move_down();
+            self.focus_item_move_down();
             state.debug.log(String::from("move focus select item"));
         }
         if state.input.key == 'k' {
-            self.focus_move_up();
+            self.focus_item_move_up();
         }
     }
-    fn focus_move_down(&mut self){
+    fn focus_item_move_down(&mut self){
         self.selected_item += 1;
     }
-    fn focus_move_up(&mut self){        
-        if self.selected_item > 1 {
+    fn focus_item_move_up(&mut self){        
+        if self.selected_item >= 1 {
             self.selected_item -= 1;
         }
     }
