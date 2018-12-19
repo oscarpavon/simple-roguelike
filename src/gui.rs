@@ -9,6 +9,19 @@ use crate::point::Point;
 use crate::game_state::GameState;
 
 
+pub struct Debug{
+    pub logs : Vec<String>
+}
+impl Debug {
+    pub fn print_all_log(&self){
+        for i in 0..self.logs.len() {
+            println!("{}",self.logs[i]);
+        }
+    }
+    pub fn log(&mut self, text : String){
+        self.logs.push(text);
+    }
+}
 #[derive(PartialEq)]
 pub enum GUIState {
     HelpScreen,
@@ -109,7 +122,11 @@ impl GUI {
         true
     }
     pub fn draw(&mut self, _game: &mut GameState, text: DrawText){     
-      
+        let mut new_debug = Debug{
+            logs : Vec::new()
+        };
+        new_debug.log(String::from("log01"));
+        
         match self.state {
             GUIState::HelpScreen => {
                 self.clear();
@@ -129,7 +146,7 @@ impl GUI {
                
             }
             GUIState::ConsoleMode => {                 
-                 self.draw_console();
+                 self.draw_console(&mut new_debug);
             }
             GUIState::None =>     {
                  self.clear();
@@ -141,16 +158,22 @@ impl GUI {
        cursor().goto(0, self.size.y);//input command position
        cursor().goto(self.cursor.x, self.cursor.y);//input command position
     }
-    fn draw_console(&mut self){
+    fn draw_console(&mut self, debug : &mut Debug){
         loop {
 			let mut input_string_buffer = String::new();
             io::stdin().read_line(&mut input_string_buffer);
             let parts: Vec<&str> = input_string_buffer.trim().split(' ').collect();
-            if parts[0] == "exit"{
-                self.state = GUIState::None;
+            match parts[0]{
+                "exit" => {
+                      self.state = GUIState::None;
                 break
-            }else {
-                println!("error command");
+                }
+                "log" => {
+                    debug.print_all_log();
+                }
+                _ => {
+                    println!("error command");
+                }
             }
             
 
