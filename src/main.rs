@@ -30,7 +30,9 @@ use crate::point::Point;
 const GUI_DEBUG_MODE : u8 = 1; //open and run the game in new terminal
 const GUI_NORMAL_MODE : u8 = 2; //run the game in the same terminal
 
-
+pub struct Input {
+	pub mode : u8 // mode 1 = read key ; mode 2 = read line
+}
 fn main() {
 	println!("Starting game..");
 
@@ -284,6 +286,10 @@ fn input_control(state : &mut GameState , gui : &mut GUI) {
   						io::stdin().read_line(&mut input_string_buffer);
 						let command = Command::get(state, input_string_buffer, gui);
  						input_command(state, command, gui);
+				}
+				'c' => {//console mode
+						gui.state = GUIState::ConsoleMode;
+						gui.clear();
 				}
 				_ => {}
 			}

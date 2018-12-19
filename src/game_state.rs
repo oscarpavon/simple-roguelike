@@ -8,6 +8,10 @@ use crate::GUI;
 
 pub const PLAYER_ID: CreatureId = 0;
 
+pub struct Input {
+	pub mode : u8 // mode 1 = read key ; mode 2 = read line
+}
+
 pub struct GameState {
 	pub creatures: CreatureMap,
 	pub aggressive: Vec<CreatureId>,

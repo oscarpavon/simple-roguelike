@@ -7,11 +7,13 @@ use std::io;
 use crate::GameState;
 use crate::point::Point;
 
+
 #[derive(PartialEq)]
 pub enum GUIState {
     HelpScreen,
     MessageBox,
     MainMenu,
+    ConsoleMode,
     None
 }
 pub struct GUI {
@@ -107,6 +109,9 @@ impl GUI {
                 self.state = GUIState::None;
                
             }
+            GUIState::ConsoleMode => {                 
+                 self.draw_console();
+            }
             GUIState::None =>     {
                  self.clear();
                  self.draw_game_interface(_game,text);
@@ -116,6 +121,21 @@ impl GUI {
        
        cursor().goto(0, self.size.y);//input command position
        cursor().goto(self.cursor.x, self.cursor.y);//input command position
+    }
+    fn draw_console(&mut self){
+        loop {
+			let mut input_string_buffer = String::new();
+            io::stdin().read_line(&mut input_string_buffer);
+            let parts: Vec<&str> = input_string_buffer.trim().split(' ').collect();
+            if parts[0] == "exit"{
+                self.state = GUIState::None;
+                break
+            }else {
+                println!("error command");
+            }
+            
+
+        }
     }
      fn draw_game_interface(&self, _game : &GameState, text: DrawText){
          let _cursor = cursor();
