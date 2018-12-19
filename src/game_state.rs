@@ -7,6 +7,19 @@ use crate::weapons::*;
 
 pub const PLAYER_ID: CreatureId = 0;
 
+pub struct Debug{
+    pub logs : Vec<String>
+}
+impl Debug {
+    pub fn print_all_log(&self){
+        for i in 0..self.logs.len() {
+            println!("{}",self.logs[i]);
+        }
+    }
+    pub fn log(&mut self, text : String){
+        self.logs.push(text);
+    }
+}
 #[derive(Clone)]
 pub struct GameInput {
 	pub mode : u8,// mode 1 = read key ; mode 2 = read line
@@ -17,7 +30,8 @@ pub struct GameState {
 	pub creatures: CreatureMap,
 	pub aggressive: Vec<CreatureId>,
 	pub weapon_manager : WeaponManager,
-	pub input : GameInput
+	pub input : GameInput,
+	pub debug : Debug
 	
 }
 
@@ -43,12 +57,16 @@ impl GameState {
 			mode : 0,
 			key : ':'
 		};
+		let mut new_debug = Debug{
+            logs : Vec::new()
+        };
+        new_debug.log(String::from("log01"));
 		let mut state = GameState {
 			creatures: CreatureMap::new(),
 			aggressive: Vec::new(),
 			weapon_manager: WeaponManager::new(),
-			input : new_input_data
-			
+			input : new_input_data,
+			debug : new_debug
 		};
 		state.creatures.add(player);
 		state

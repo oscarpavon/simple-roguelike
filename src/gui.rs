@@ -9,19 +9,7 @@ use crate::point::Point;
 use crate::game_state::GameState;
 
 
-pub struct Debug{
-    pub logs : Vec<String>
-}
-impl Debug {
-    pub fn print_all_log(&self){
-        for i in 0..self.logs.len() {
-            println!("{}",self.logs[i]);
-        }
-    }
-    pub fn log(&mut self, text : String){
-        self.logs.push(text);
-    }
-}
+
 #[derive(PartialEq)]
 pub enum GUIState {
     HelpScreen,
@@ -64,9 +52,10 @@ impl FloatMenu {
         self.item_vec = list;
         self
     }
-    pub fn update(&mut self, state : &GameState){
+    pub fn update(&mut self, state : &mut GameState){
         if state.input.key == 'j' {
             self.focus_move_down();
+            state.debug.log(String::from("move focus select item"));
         }
         if state.input.key == 'k' {
             self.focus_move_up();
@@ -121,12 +110,8 @@ impl GUI {
         }
         true
     }
-    pub fn draw(&mut self, _game: &mut GameState, text: DrawText){     
-        let mut new_debug = Debug{
-            logs : Vec::new()
-        };
-        new_debug.log(String::from("log01"));
-        
+    pub fn draw(&mut self, state: &mut GameState, text: DrawText){     
+               
         match self.state {
             GUIState::HelpScreen => {
                 self.clear();
@@ -141,16 +126,16 @@ impl GUI {
                 self.clear();
                 self.draw_main_menu();
                 let player_name = self.get_player_name_from_input();
-                _game.creatures.get_mut(0).expect("no creature").name = player_name;
+                state.creatures.get_mut(0).expect("no creature").name = player_name;
                 self.state = GUIState::None;
                
             }
             GUIState::ConsoleMode => {                 
-                 self.draw_console(&mut new_debug);
+                 self.draw_console(state);
             }
             GUIState::None =>     {
                  self.clear();
-                 self.draw_game_interface(_game,text);
+                 self.draw_game_interface(state,text);
             }         
             
         }     
@@ -158,7 +143,7 @@ impl GUI {
        cursor().goto(0, self.size.y);//input command position
        cursor().goto(self.cursor.x, self.cursor.y);//input command position
     }
-    fn draw_console(&mut self, debug : &mut Debug){
+    fn draw_console(&mut self, state : & GameState){
         loop {
 			let mut input_string_buffer = String::new();
             io::stdin().read_line(&mut input_string_buffer);
@@ -169,7 +154,7 @@ impl GUI {
                 break
                 }
                 "log" => {
-                    debug.print_all_log();
+                    state.debug.print_all_log();
                 }
                 _ => {
                     println!("error command");
@@ -179,7 +164,7 @@ impl GUI {
 
         }
     }
-     fn draw_game_interface(&mut self, _game : &GameState, text: DrawText){
+     fn draw_game_interface(&mut self, _game : &mut GameState, text: DrawText){
          let _cursor = cursor();
         self.draw_status_bar(_game);
         self.draw_enemies_names(_game);
@@ -195,7 +180,7 @@ impl GUI {
                 .with_color(Color::Green).with_pos(1, self.size.y - 4));
      }
 
-    fn draw_menus(&mut self, state : &GameState){
+    fn draw_menus(&mut self, state : &mut GameState){
         for i in 0..self.menus_to_draw.len(){
             self.menus_to_draw[i].update(state);
             self.draw_float_menu(&self.menus_to_draw[i]);
