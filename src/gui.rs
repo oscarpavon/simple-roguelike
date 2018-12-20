@@ -62,7 +62,9 @@ impl FloatMenu {
         }
     }
     fn focus_item_move_down(&mut self){
-        self.selected_item += 1;
+        if self.selected_item < self.item_vec.len() - 1 {
+             self.selected_item += 1;
+        }       
     }
     fn focus_item_move_up(&mut self){        
         if self.selected_item >= 1 {
