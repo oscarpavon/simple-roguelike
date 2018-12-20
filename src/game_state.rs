@@ -182,9 +182,9 @@ impl GameState {
 			creatures_list_name.push(creature_string.clone());
 			creature_string = String::new();
 			
-			creature_string.push_str(
-				format!("{}; \n ", creature.name).as_str()
-			);
+			//creature_string.push_str(
+			//	format!("{}; \n ", creature.name).as_str()
+			//);
 			count += 1;
 		}
 

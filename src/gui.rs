@@ -23,7 +23,8 @@ pub struct GUI {
     pub state: GUIState,
     pub float_menu: FloatMenu,
     pub cursor: Point,
-    pub menus_to_draw : Vec<FloatMenu>        
+    pub menus_to_draw : Vec<FloatMenu>,
+    pub active_menu_number : u16      
 }
 pub struct FloatMenu {
     pub focus: bool,//only is focus read input
@@ -52,7 +53,7 @@ impl FloatMenu {
         self.item_vec = list;
         self
     }
-    pub fn update(&mut self, state : &mut GameState){
+    pub fn update(&mut self, state : &mut GameState){//update state of selected menu item
         if state.input.key == 'j' {
             self.focus_item_move_down();
             state.debug.log(String::from("move focus select item"));
@@ -184,11 +185,24 @@ impl GUI {
 
     fn draw_menus(&mut self, state : &mut GameState){
         for i in 0..self.menus_to_draw.len(){
-            self.menus_to_draw[i].update(state);
+            if self.menus_to_draw[i].focus {
+                self.menus_to_draw[i].update(state);//read imput and update what item draw with different color
+            }
             self.draw_float_menu(&self.menus_to_draw[i]);
         }
     }
+    pub fn focus_next_menu(&mut self){
+        
+        for i in 0..self.menus_to_draw.len(){
+            self.menus_to_draw[i].focus = false;
+        }
+        self.active_menu_number += 1;
+        if self.active_menu_number > self.menus_to_draw.len() as u16{
+            self.active_menu_number = 0;
+        }
+        self.menus_to_draw[self.active_menu_number as usize].focus = true;
 
+    }
     //print text only where no have GUI (min: 1 , max = height - 3 )
     //TODO: where not draw condition
     pub fn print(&self, text: DrawText) {
@@ -253,15 +267,15 @@ impl GUI {
             }
 
     }
-    pub fn draw_enemies_names(& self, _game : &GameState){
+    pub fn draw_enemies_names(&mut self, _game : &GameState){
         self.print(DrawText::new("Health").with_color(Color::Green).with_pos(20, 5));
 
         let creatures_names = _game.get_alive_creatures_name();
 
-       // let mut new_float_menu = FloatMenu::new(Point::new(0, 8))
-         //                   .with_array_items(creatures_names);      
+        let mut new_float_menu = FloatMenu::new(Point::new(1, 8))
+                                            .with_array_items(creatures_names);      
        
-        //self.draw_float_menu(&new_float_menu);
+        self.menus_to_draw.push(new_float_menu);
     }
 
     fn draw_status_bar(& self, _game : &GameState){
@@ -330,6 +344,7 @@ impl GUI {
         if menu.visible {
             if menu.focus {
                 self.print(DrawText::new("*")
+                .with_color(Color::Blue)
                 .with_pos(menu.position.x-1, menu.position.y));
             }
             for i in 0..menu.item_vec.len(){

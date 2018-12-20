@@ -61,7 +61,7 @@ fn init_data_go_in_loop_game(mode : u8){
 	let mut state = GameState::new(creatures[0].clone()); // [0] is the player
 
 	state.add_register(creatures[1].clone());
-	state.add_register(creatures[1].clone());
+	state.add_register(creatures[2].clone());
 
 	let mut items_menu = Vec::new();
 	let item_one = String::from("Attack");
@@ -103,7 +103,8 @@ fn init_data_go_in_loop_game(mode : u8){
 		state: GUIState::MainMenu,
 		float_menu: other_menu,
 		cursor: Point::empty(),
-		menus_to_draw : menus		
+		menus_to_draw : menus,
+		active_menu_number : 0		
 	};
 
 	
@@ -221,9 +222,12 @@ fn input_control(state : &mut GameState , gui : &mut GUI) {
 					gui.cursor.x = 30;
 					gui.cursor.y = 6;
 				}
+				'f' => {//focus next menu
+					gui.focus_next_menu();
+				}
 				's' => {//select
-					gui.cursor.x = 12;
-					gui.cursor.y = 6;
+					//gui.cursor.x = 12;
+					//gui.cursor.y = 6;
 					/* gui.float_menu.visible = if gui.float_menu.visible == false {
 						gui.float_menu.focus = true;
 						true
